@@ -9,6 +9,7 @@ add_executable(Term__Project__System_Monitor_
         CPU/CPUUtilities.c
         Disk_IO/DiskIO_monitoring.c
         Disk_IO/DiskIO_monitoring.h
-)
+        Memory/Memory.h
+        Memory/Memory.c)
 
 target_link_libraries(Term__Project__System_Monitor_ pdh)
