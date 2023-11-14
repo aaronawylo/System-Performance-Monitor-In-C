@@ -46,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     hwnd = CreateWindowEx(
             0,                   /* Extended possibilities for variation */
             szClassName,         /* Classname */
-            "CPU Usage Monitor", /* Title Text */
+            "Awesome CPU Usage Monitor", /* Title Text */
             WS_OVERLAPPEDWINDOW, /* default window */
             CW_USEDEFAULT,       /* Windows decides the position */
             CW_USEDEFAULT,       /* where the window ends up on the screen */
