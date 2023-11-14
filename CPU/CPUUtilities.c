@@ -2,8 +2,7 @@
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <stdio.h>
-
-
+#include "CPUUtilities.h"
 
 PDH_HQUERY cpuQuery;
 PDH_HCOUNTER cpuTotal;
@@ -15,7 +14,6 @@ void setupPdhQuery() {
     PdhCollectQueryData(cpuQuery);
 }
 
-#ifndef CPU_USAGE_H
 double getCurrentCpuUsage() {
     PDH_FMT_COUNTERVALUE counterVal;
 
@@ -23,4 +21,3 @@ double getCurrentCpuUsage() {
     PdhGetFormattedCounterValue(cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
     return counterVal.doubleValue;
 }
-#endif // CPU_USAGE_H
