@@ -8,13 +8,14 @@
 #include <windows.h>
 #include <unistd.h>
 #include <psapi.h>
+#include "Memory.h"
 
 int getMemoryUsage() {
     PROCESS_MEMORY_COUNTERS pmc;
 
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
         // Print memory usage information
-        return (unsigned int)(pmc.WorkingSetSize / 1024);
+        return (int)(pmc.WorkingSetSize / 1024);
     } else {
         return 1;
     }
