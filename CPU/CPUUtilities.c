@@ -2,6 +2,7 @@
 #include <pdh.h>
 #include <pdhmsg.h>
 #include <stdio.h>
+#include "CPUUtilities.h"
 
 PDH_HQUERY cpuQuery;
 PDH_HCOUNTER cpuTotal;
@@ -19,19 +20,4 @@ double getCurrentCpuUsage() {
     PdhCollectQueryData(cpuQuery);
     PdhGetFormattedCounterValue(cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
     return counterVal.doubleValue;
-}
-
-
-int main() {
-    setupPdhQuery();
-
-    while (1) {
-        printf("Current CPU Usage: %.2f%%\n", getCurrentCpuUsage());
-        Sleep(1000); // Sample every second
-    }
-
-    // Close the query
-    PdhCloseQuery(cpuQuery);
-
-    return 0;
 }
