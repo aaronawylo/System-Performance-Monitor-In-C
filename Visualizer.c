@@ -6,10 +6,7 @@ double getCurrentCpuUsage();
 
 #endif // CPU_UTILITIES_H
 #include <windows.h>
-#include <pdh.h>
 #include <stdio.h>
-// Add additional headers for GUI
-#include <stdlib.h>
 #include <string.h>
 
 
