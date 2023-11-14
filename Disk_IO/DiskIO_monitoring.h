@@ -1,0 +1,12 @@
+//
+// Created by Abdulqadir Abuharrus on 2023-11-14.
+//
+
+#ifndef TERM__PROJECT__SYSTEM_MONITOR__DISKIO_MONITORING_H
+#define TERM__PROJECT__SYSTEM_MONITOR__DISKIO_MONITORING_H
+
+void getDiskSpace();
+
+void getDiskIO();
+
+#endif //TERM__PROJECT__SYSTEM_MONITOR__DISKIO_MONITORING_H
