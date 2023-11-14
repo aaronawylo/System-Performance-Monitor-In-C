@@ -1,7 +1,5 @@
 #include <windows.h>
 #include <pdh.h>
-#include <pdhmsg.h>
-#include <stdio.h>
 #include "CPUUtilities.h"
 
 PDH_HQUERY cpuQuery;
