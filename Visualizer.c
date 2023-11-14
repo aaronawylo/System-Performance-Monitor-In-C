@@ -27,24 +27,24 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     wincl.lpszClassName = szClassName;
     wincl.lpfnWndProc = WindowProcedure;      /* This function is called by windows */
     wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
-    wincl.cbSize = sizeof (WNDCLASSEX);
+    wincl.cbSize = sizeof(WNDCLASSEX);
 
     /* Use default icon and mouse-pointer */
     wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL;                 /* No menu */
-    wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;                      /* structure or the window instance */
+    wincl.lpszMenuName = NULL;                /* No menu */
+    wincl.cbClsExtra = 0;                     /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0;                     /* structure or the window instance */
     /* Use Windows's default color as the background of the window */
     wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
 
     /* Register the window class, and if it fails quit the program */
     if (!RegisterClassEx(&wincl)) return 0;
 
-    /* The class is registered, let's create the program*/
+    /* The class is registered, let's create the program */
     hwnd = CreateWindowEx(
-            0,                   /* Extended possibilites for variation */
+            0,                   /* Extended possibilities for variation */
             szClassName,         /* Classname */
             "CPU Usage Monitor", /* Title Text */
             WS_OVERLAPPEDWINDOW, /* default window */
@@ -61,6 +61,9 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     /* Make the window visible on the screen */
     ShowWindow(hwnd, nCmdShow);
 
+    setupPdhQuery();  // Initialize PDH Query
+    SetTimer(hwnd, 1, 500, NULL); // Set a timer to update every half second
+
     /* Run the message loop. It will run until GetMessage() returns 0 */
     while (GetMessage(&messages, NULL, 0, 0)) {
         /* Translate virtual-key messages into character messages */
@@ -72,7 +75,6 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     /* The program return-value is 0 - The value that PostQuitMessage() gave */
     return messages.wParam;
 }
-
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
     switch (message) {
@@ -86,6 +88,10 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             TextOut(hdc, 10, 10, text, strlen(text));
 
             EndPaint(hwnd, &ps);
+        }
+            break;
+        case WM_TIMER: {
+            InvalidateRect(hwnd, NULL, TRUE); // Force window to be redrawn
         }
             break;
         case WM_DESTROY:
