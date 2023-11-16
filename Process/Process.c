@@ -4,22 +4,22 @@
 #include <stdio.h>
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
-DWORD lpdwProcessId;
-GetWindowThreadProcessId(hwnd, &lpdwProcessId);
+    DWORD lpdwProcessId;
+    GetWindowThreadProcessId(hwnd, &lpdwProcessId);
 
-if (lpdwProcessId == (DWORD)lParam) {
-char windowTitle[256];
-if (GetWindowText(hwnd, windowTitle, sizeof(windowTitle)) > 0) {
-if (IsWindowVisible(hwnd)) {
-return FALSE;
-}
-}
-}
-return TRUE;
+    if (lpdwProcessId == (DWORD) lParam) {
+        char windowTitle[256];
+        if (GetWindowText(hwnd, windowTitle, sizeof(windowTitle)) > 0) {
+            if (IsWindowVisible(hwnd)) {
+                return FALSE;
+            }
+        }
+    }
+    return TRUE;
 }
 
 BOOL IsUserApplication(DWORD processID) {
-    return !EnumWindows(EnumWindowsProc, (LPARAM)processID);
+    return !EnumWindows(EnumWindowsProc, (LPARAM) processID);
 }
 
 void PrintProcesses() {
@@ -51,7 +51,7 @@ void PrintProcesses() {
                 }
 
                 if (strcmp(processName, "<unknown>") != 0 && IsUserApplication(processes[i])) {
-                    printf("%-15u%-30s%-10s\n", processes[i], processName, "Running");
+                    printf("%-15lu%-30s%-10s\n", processes[i], processName, "Running");
                 }
 
                 CloseHandle(hProcess);
@@ -60,7 +60,7 @@ void PrintProcesses() {
     }
 }
 
-//int main() {
-//    PrintProcesses();
-//    return 0;
-//}
+int processMain() {
+    PrintProcesses();
+    return 0;
+}
