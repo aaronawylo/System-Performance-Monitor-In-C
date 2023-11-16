@@ -9,7 +9,7 @@ void displaySystemUptime() {
     printf("The system has been up for %u hours and %u minutes.\n", hours, minutes);
 }
 
- int main() {
-     displaySystemUptime();
-     return 0;
- }
+// int main() {
+//     displaySystemUptime();
+//     return 0;
+// }
