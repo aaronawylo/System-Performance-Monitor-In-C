@@ -6,6 +6,8 @@
 #include <pdh.h>
 #include "ProcessingAndStorage.h"
 #include "../CPU/CPUUtilities.h"
+#include "../Network/NetworkUtilities.h"
+#include "../Disk_IO/DiskIO_monitoring.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,37 +19,37 @@ struct PerformanceData {
     double cpu;
     double memory;
     double diskIO;
-    double networkUsage;
+    double totalNetworkTraffic;
 };
 
-// Function to process data
-void processData(struct PerformanceData *data, int dataSize) {
-    double totalCpu = 0, totalMemory = 0, totalDiskIO = 0, totalNetworkUsage = 0;
-    int count = 0;
-
-    for (int i = 0; i < dataSize; ++i) {
-        totalCpu += data[i].cpu;
-        totalMemory += data[i].memory;
-        totalDiskIO += data[i].diskIO;
-        totalNetworkUsage += data[i].networkUsage;
-        count++;
-    }
-
-    // Check if count is not zero to avoid division by zero
-    if (count != 0) {
-        double averageCpu = totalCpu / count;
-        double averageMemory = totalMemory / count;
-        double averageDiskIO = totalDiskIO / count;
-        double averageNetworkUsage = totalNetworkUsage / count;
-
-        printf("\nAverage CPU: %.2f%%\n", averageCpu);
-        printf("Average Memory: %.2f%%\n", averageMemory);
-        printf("Average Disk IO: %.2f\n", averageDiskIO);
-        printf("Average Network Usage: %.2f\n", averageNetworkUsage);
-    } else {
-        printf("No data points to calculate averages.\n");
-    }
-}
+//// Function to process data
+//void processData(struct PerformanceData *data, int dataSize) {
+//    double totalCpu = 0, totalMemory = 0, totalDiskIO = 0, totalNetworkUsage = 0;
+//    int count = 0;
+//
+//    for (int i = 0; i < dataSize; ++i) {
+//        totalCpu += data[i].cpu;
+//        totalMemory += data[i].memory;
+//        totalDiskIO += data[i].diskIO;
+//        totalNetworkUsage += data[i].totalNetworkTraffic;
+//        count++;
+//    }
+//
+//    // Check if count is not zero to avoid division by zero
+//    if (count != 0) {
+//        double averageCpu = totalCpu / count;
+//        double averageMemory = totalMemory / count;
+//        double averageDiskIO = totalDiskIO / count;
+//        double averageNetworkUsage = totalNetworkUsage / count;
+//
+//        printf("\nAverage CPU: %.2f%%\n", averageCpu);
+//        printf("Average Memory: %.2f%%\n", averageMemory);
+//        printf("Average Disk IO: %.2f\n", averageDiskIO);
+//        printf("Average Network Usage: %.2f\n", averageNetworkUsage);
+//    } else {
+//        printf("No data points to calculate averages.\n");
+//    }
+//}
 
 // Function to save data to a file
 void saveData(struct PerformanceData *data, int dataSize, const char *filename) {
@@ -59,7 +61,13 @@ void saveData(struct PerformanceData *data, int dataSize, const char *filename) 
     }
 
     for (int i = 0; i < dataSize; ++i) {
-        fprintf(file, "%s %.2f %.2f %.2f %.2f\n", data[i].timestamp, data[i].cpu, data[i].memory, data[i].diskIO, data[i].networkUsage);
+        fprintf(file, "Timestamp: %s\n"
+                      "CPU Usage: %.2lf\n"
+                      "Memory Usage: %.2lf\n"
+                      "Disk Usage: %.2lf\n"
+                      "Total Network Traffic: %.2lf\n\n",
+                data[i].timestamp, data[i].cpu, data[i].memory,
+                data[i].diskIO, data[i].totalNetworkTraffic);
     }
 
     fclose(file);
@@ -92,7 +100,14 @@ void loadData(struct PerformanceData **data, int *dataSize, const char *filename
 
     // Read data from the file
     struct PerformanceData temp;
-    while (fscanf(file, "%s %lf %lf %lf %lf", temp.timestamp, &temp.cpu, &temp.memory, &temp.diskIO, &temp.networkUsage) == 5) {
+    while (fscanf(file,
+                  "Timestamp: %s\n"
+                  "CPU Usage: %lf\n"
+                  "Memory Usage: %lf\n"
+                  "Disk Usage: %lf\n"
+                  "Total Network Traffic: %lf\n\n",
+                  temp.timestamp, &temp.cpu, &temp.memory,
+                  &temp.diskIO, &temp.totalNetworkTraffic) == 5) {
         (*dataSize)++;
         *data = realloc(*data, (*dataSize) * sizeof(struct PerformanceData));
         if (*data == NULL) {
@@ -106,9 +121,38 @@ void loadData(struct PerformanceData **data, int *dataSize, const char *filename
     fclose(file);
 }
 
+double calculateDiskUsagePercentage() {
+    char diskName[] = "C";
+
+    ULARGE_INTEGER total, free, totalfree;
+
+    if (!GetDiskFreeSpaceEx(diskName, &total, &totalfree, &free)) {
+        DWORD error = GetLastError();
+        if (error == ERROR_PATH_NOT_FOUND) {
+            printf("Error: Disk not found or path not available.\n");
+        } else {
+            printf("Error getting disk space. Error code: %lu\n", error);
+        }
+        // Handle the error as needed
+        return -1.0;
+    }
+
+    double diskTotal = getDiskTotal(total);
+    double diskFree = getDiskFreeSpace(free);
+
+    if (diskTotal > 0) {
+        double usagePercentage = ((diskTotal - diskFree) / diskTotal) * 100;
+        return usagePercentage;
+    } else {
+        return 0.0;
+    }
+}
+
 int main() {
     // Initialize PDH Query
     setupPdhQuery();
+    SetupSentQuery();
+    SetupReceivedQuery();
 
     // Load existing data from a file
     struct PerformanceData *loadedData;
@@ -125,23 +169,22 @@ int main() {
                 localTime.wYear, localTime.wMonth, localTime.wDay,
                 localTime.wHour, localTime.wMinute, localTime.wSecond);
 
-        // Get real-time CPU usage
+        // Get real-time performance stats
         double currentCpuUsage = getCurrentCpuUsage();
         double currentMemoryUsage = 0;
-        double currentDiskIO = 0;
-        double currentNetworkUsage = 0;
+        double currentDiskUsage = calculateDiskUsagePercentage();
+        double currentNetworkSent = GetNetworkSent();
+        double currentNetworkReceived = GetNetworkReceived();
 
         // Process and display data
         struct PerformanceData currentData = {
                 .cpu = currentCpuUsage,
                 .memory = currentMemoryUsage,
-                .diskIO = currentDiskIO,
-                .networkUsage = currentNetworkUsage
+                .diskIO = currentDiskUsage,
+                .totalNetworkTraffic = currentNetworkSent + currentNetworkReceived
         };
 
         strcpy(currentData.timestamp, timestamp);
-
-        processData(&currentData, 1);
 
         // Append real-time data to loaded data
         loadedDataSize++;

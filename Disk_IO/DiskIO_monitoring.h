@@ -6,8 +6,8 @@
 #define DISKIO_MONITORING_H
 
 
-double getDiskTotal();
-double getDiskFreeSpace();
+double getDiskTotal(ULARGE_INTEGER total);
+double getDiskFreeSpace(ULARGE_INTEGER free);
 double getDiskTotalFree();
 double getDiskRead();
 double getDiskWrite();
