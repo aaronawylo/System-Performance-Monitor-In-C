@@ -8,26 +8,15 @@
 #include <windows.h>
 #include <unistd.h>
 #include <psapi.h>
+#include "Memory.h"
 
-void print_memory_usage() {
+int getMemoryUsage() {
     PROCESS_MEMORY_COUNTERS pmc;
 
     if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
         // Print memory usage information
-        printf("Memory usage: %u KB\n", (unsigned int)(pmc.WorkingSetSize / 1024));
+        return (int)(pmc.WorkingSetSize / 1024);
     } else {
-        perror("Error getting process memory info");
+        return 1;
     }
-}
-
-int memoryMain() {
-    int i = 0;
-    while (i < 5) {
-        // Print memory usage every 5 seconds
-        print_memory_usage();
-        Sleep(5000);  // Sleep for 5 seconds (note: Sleep uses milliseconds)
-        i += 1;
-    }
-
-    return 0;
 }
