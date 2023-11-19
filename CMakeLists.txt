@@ -6,6 +6,8 @@ set(CMAKE_C_STANDARD 11)
 add_executable(Term__Project__System_Monitor_
         CPU/CPUUtilities.h
         CPU/CPUUtilities.c
+        Memory/Memory.h
+        Memory/Memory.c
         Visualizer.c
         Process/Process.h
         Process/Process.c
@@ -13,7 +15,6 @@ add_executable(Term__Project__System_Monitor_
         Uptime/Uptime.h
         Disk_IO/DiskIO_monitoring.c
         Disk_IO/DiskIO_monitoring.h
-        Memory/Memory.c
         Network/Network.c
         Network/NetworkUtilities.h
         Disk_IO/DiskIO_monitoring.c
