@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.26)
 project(Term__Project__System_Monitor_ C)
+set(CMAKE_CXX_STANDARD 11)
+include_directories("C:/raylib/raylib/src")
+link_directories("C:/raylib/raylib/src")
 
-set(CMAKE_C_STANDARD 11)
 
 add_executable(Term__Project__System_Monitor_
         CPU/CPUUtilities.h
@@ -18,6 +20,7 @@ add_executable(Term__Project__System_Monitor_
         Network/Network.c
         Network/NetworkUtilities.h
         Disk_IO/DiskIO_monitoring.c
+        raylib/raygui.c
 )
 
-target_link_libraries(Term__Project__System_Monitor_ pdh wevtapi)
+target_link_libraries(Term__Project__System_Monitor_ raylib winmm pdh wevtapi)
