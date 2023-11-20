@@ -1,0 +1,3 @@
+[submodule ".idea/raylib"]
+	path = .idea/raylib
+	url = https://github.com/raysan5/raylib.git
