@@ -14,8 +14,6 @@ add_executable(Term__Project__System_Monitor_
         Visualizer.c
         Process/Process.h
         Process/Process.c
-        Uptime/Uptime.c
-        Uptime/Uptime.h
         Disk_IO/DiskIO_monitoring.c
         Disk_IO/DiskIO_monitoring.h
         Network/Network.c
