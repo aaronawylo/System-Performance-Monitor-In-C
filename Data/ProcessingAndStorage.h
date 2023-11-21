@@ -6,8 +6,8 @@
 #define DATA_PROCESSING_AND_STORAGE_H
 
 struct PerformanceData;
-void processData(struct PerformanceData *data, int dataSize);
-void saveData(struct PerformanceData *data, int dataSize, const char *filename);
-void loadData(struct PerformanceData **data, int *dataSize, const char *filename);
+void saveData(struct PerformanceData *data, const char *filename);
+double calculateDiskUsagePercentage();
+double calculateTotalNetworkTraffic();
 
 #endif // DATA_PROCESSING_AND_STORAGE_H
