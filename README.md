@@ -22,12 +22,17 @@ This System Performance Monitoring program is developed in C for Windows systems
 
     Windows Operating System
     Compiler with support for Windows-specific libraries (Recommended: Microsoft Visual C++ Compiler)
+    Raylib library for GUI rendering (see Installation section below)
     (Any additional software or libraries needed for running or compiling the program)
 
 ### Installation
 
     Clone the repository: git clone https://github.com/[repository-link]
     Navigate to the project directory: cd System-Performance-Monitor-In-C-For-Windows
+    Setting Up Raylib:
+        1. Download Raylib for Windows from the Raylib releases page.
+        2. Install Raylib by running the downloaded installer.
+        3. Configure your Compiler/IDE to include Raylib's headers and link against Raylib's library.
     Compile the program:
         Using MSVC: (Provide the command or steps)
         (Other compilers if applicable)
