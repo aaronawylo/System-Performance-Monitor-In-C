@@ -1,81 +1,133 @@
-#include "raylib.h"
 #define RAYGUI_IMPLEMENTATION
+#define UPDATE_INTERVAL 1.0
+#define GRAPH_HISTORY_LENGTH 100
+
+#include "raylib.h"
 #include "raygui.h"
 #include "CPUUtilities.h"
-#include "Memory.h"
 #include "stdio.h"
 #include "../Memory/Memory.h"
+#include "style_cyber.h"
+#include "../User/CurrentUser.h"
 
-#define UPDATE_INTERVAL 1.0 // Update interval in seconds (e.g., update every 1 second)
+void DrawGraph(int *values, int count, Rectangle bounds, Color color) {
+    if (count > 1) {
+        int maxValue = 0;
+        for (int i = 0; i < count; i++) {
+            if (values[i] > maxValue) maxValue = values[i];
+        }
+
+        // Draw the lines
+        for (int i = 1; i < count; i++) {
+            Vector2 startPos = { bounds.x + (bounds.width / count) * (i - 1), bounds.y + bounds.height - (values[i - 1] / (float)maxValue) * bounds.height };
+            Vector2 endPos = { bounds.x + (bounds.width / count) * i, bounds.y + bounds.height - (values[i] / (float)maxValue) * bounds.height };
+            DrawLineV(startPos, endPos, color);
+        }
+    }
+}
 
 int main() {
-    const char* currentDirectory = GetWorkingDirectory();
+    int screenWidth = 1280;
+    int screenHeight = 720;
+    InitWindow(screenWidth, screenHeight, "");
+    GuiLoadStyleCyber();
 
-    // Construct the full path to the theme file
-    char themeFilePath[512];
-    snprintf(themeFilePath, sizeof(themeFilePath), "%s/raygui/style_candy.rgs", currentDirectory);
-    GuiLoadStyle(themeFilePath);
+    SetTargetFPS(60);
 
-    InitWindow(800, 500, "Awesome CPU and Memory Usage Monitor");
-    SetTargetFPS(8);  // Set FPS
+    //get the current user system info: name, uptime, date/time, ...
+    char dateTimeStr[100];
+    char* userName = getCurrentUserName();
+    char uptimeStr[100];
 
-    setupPdhQuery();  // Initialize your custom CPU and Memory monitoring
+    setupPdhQuery();
+    double elapsedTime = 0.0;
+    double cpuUsage = 0.0;
+    int memoryUsage = 0;
+    Rectangle panelRec = { 5, 5, (float)screenWidth - 10, (float)screenHeight - 10 };
 
-    // Set style for text boxes to white and increase font size
-    GuiSetStyle(TEXTBOX, BASE_COLOR_NORMAL, ColorToInt(RAYWHITE));
-    GuiSetStyle(TEXTBOX, TEXT_SIZE, 20);  // Increase font size for text boxes
+    // Graph data
+    int cpuHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    int memoryHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    int historyIndex = 0;
 
-    // Define a custom blue color
-    Color blueColor = (Color){0, 102, 255, 255}; // (R, G, B, A)
-
-    double elapsedTime = 0.0; // Elapsed time since the last update
-    double cpuUsage = 0.0;   // Current CPU usage
-
-    // Main game loop
     while (!WindowShouldClose()) {
-        // Update elapsed time
         double deltaTime = GetFrameTime();
         elapsedTime += deltaTime;
+        //get user info
+        getCurrentDateTime(dateTimeStr, sizeof(dateTimeStr));
+        getSystemUptime(uptimeStr, sizeof(uptimeStr));
 
-        // Update (handle input, update data, etc.)
         if (elapsedTime >= UPDATE_INTERVAL) {
-            // Get the current CPU usage
             cpuUsage = getCurrentCpuUsage();
+            memoryUsage = getMemoryUsage();
 
-            // Reset the elapsed time
+            cpuHistory[historyIndex] = (int)(cpuUsage * 10);
+            memoryHistory[historyIndex] = memoryUsage;
+
+            historyIndex = (historyIndex + 1) % GRAPH_HISTORY_LENGTH;
             elapsedTime = 0.0;
         }
 
-        // Draw
         BeginDrawing();
         ClearBackground(RAYWHITE);
-
-        // Set text color to the custom blue color
-        GuiSetStyle(DEFAULT, TEXT_COLOR_NORMAL, ColorToInt(blueColor));
-
-        // Draw text label "CPU" in blue and align it with the meter
-        DrawText("CPU:", 30, 25, 20, DARKBLUE);
-
-        // Draw CPU usage as a meter
-        Rectangle meterRect = { 90, 20, 200, 30 };
-        DrawRectangleLines(meterRect.x, meterRect.y, meterRect.width, meterRect.height, DARKGRAY);
-
-        // Calculate the width of the meter finger based on CPU usage
-        float meterWidth = (float)(meterRect.width * (cpuUsage / 100.0));
-        Rectangle meterFinger = { meterRect.x, meterRect.y, meterWidth, meterRect.height };
-        DrawRectangleRec(meterFinger, GREEN);
-
-        // Draw the CPU usage percentage
+        //internal window
+        GuiPanel(panelRec, "Super Awesome System Activity Monitor");
+        //title
+        DrawText("SYSTEM MONITOR", 30, 70, 30, GetColor(0x3299b4ff));
+        //rectangles for graphs
+        Rectangle cpuGraphRec = { 50, 150, 300, 100 };
+        DrawGraph(cpuHistory, GRAPH_HISTORY_LENGTH, cpuGraphRec, GetColor(0x81c0d0ff));
+        Rectangle memoryGraphRec = { 50, 330, 300, 100 };
+        DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, memoryGraphRec, GetColor(0x81c0d0ff));
+        //text for CPU
         char cpuText[100];
-        sprintf(cpuText, "%.2f%%", cpuUsage);
-        Rectangle textRect = { 300, 20, 120, 30 };
-        GuiTextBox(textRect, cpuText, 100, false);
+        sprintf(cpuText, "CPU Usage: %.2f%%", cpuUsage);
+        DrawText(cpuText, 50, 260, 20, GetColor(0x3299b4ff));
+        //text for memory
+        char memoryText[100];
+        sprintf(memoryText, "Memory Usage: %d MB", memoryUsage);
+        DrawText(memoryText, 50, 440, 20, GetColor(0x3299b4ff));
+
+        //footer boxes:
+        int boxHeight = 35;
+        int boxY = screenHeight - boxHeight - 5;
+
+
+        Rectangle box1 = { 10, boxY, 165, boxHeight };
+        Rectangle box2 = { 10 + 165, boxY, 150, boxHeight };
+        Rectangle box3 = { 10 + 165+150, boxY, 300, boxHeight };
+        Rectangle box4 = { 10 + 165+150+300, boxY, 200, boxHeight };
+        Rectangle box5 = { 10 + 165+150+300+200, boxY, 200, boxHeight };
+        Rectangle box6 = { 10 + 165+150+300+200+200, boxY, screenWidth-165-150-300-200-200-20, boxHeight };
+
+        DrawRectangleRec(box1, GetColor(0x024658ff));
+        DrawRectangleRec(box2, GetColor(0x024658ff));
+        DrawRectangleRec(box3, GetColor(0x024658ff));
+        DrawRectangleRec(box4, GetColor(0x024658ff));
+        DrawRectangleRec(box5, GetColor(0x024658ff));
+        DrawRectangleRec(box6, GetColor(0x024658ff));
+
+        int borderWidth = 1; // Width of the border
+        Color borderColor = GetColor(0x82cde0ff);
+        DrawRectangleLinesEx(box1, borderWidth, borderColor);
+        DrawRectangleLinesEx(box2, borderWidth, borderColor);
+        DrawRectangleLinesEx(box3, borderWidth, borderColor);
+        DrawRectangleLinesEx(box4, borderWidth, borderColor);
+        DrawRectangleLinesEx(box5, borderWidth, borderColor);
+        DrawRectangleLinesEx(box6, borderWidth, borderColor);
+
+
+        DrawText("Current User: ", box1.x + 12, box1.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText(userName, box2.x + 15, box2.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText("CURRENT DATE & TIME: ", box3.x + 40, box3.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText(dateTimeStr, box4.x + 22, box4.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText("SYSTEM UPTIME: ", box5.x + 22, box5.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText(uptimeStr, box6.x + 22, box6.y + 8, 18, GetColor(0x51bfd3ff));
 
         EndDrawing();
     }
 
-    // De-Initialization
-    CloseWindow();  // Close window and OpenGL context
+    CloseWindow();
 
     return 0;
 }
