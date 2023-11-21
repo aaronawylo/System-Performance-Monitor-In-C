@@ -22,7 +22,10 @@ add_executable(Term__Project__System_Monitor_
         Network/NetworkUtilities.h
         Disk_IO/DiskIO_monitoring.c
         raylib/raygui.c
+        raylib/raygui.h
         raylib/style_cyber.h
+        User/CurrentUser.c
+        User/CurrentUser.h
 )
 
 target_link_libraries(Term__Project__System_Monitor_ raylib winmm pdh wevtapi)
