@@ -17,7 +17,6 @@ void DrawGraph(int *values, int count, Rectangle bounds, Color color) {
             if (values[i] > maxValue) maxValue = values[i];
         }
 
-        // Draw the lines
         for (int i = 1; i < count; i++) {
             Vector2 startPos = { bounds.x + (bounds.width / count) * (i - 1), bounds.y + bounds.height - (values[i - 1] / (float)maxValue) * bounds.height };
             Vector2 endPos = { bounds.x + (bounds.width / count) * i, bounds.y + bounds.height - (values[i] / (float)maxValue) * bounds.height };
@@ -27,22 +26,25 @@ void DrawGraph(int *values, int count, Rectangle bounds, Color color) {
 }
 
 int main() {
+    //application window size
     int screenWidth = 1280;
     int screenHeight = 720;
+    //initalize window
     InitWindow(screenWidth, screenHeight, "");
+    //load the cyber GUI style
     GuiLoadStyleCyber();
-
+    //set frame rate to 60 FPS
     SetTargetFPS(60);
-
-    //get the current user system info: name, uptime, date/time, ...
+    //get the current user system info: name, uptime, date/time
     char dateTimeStr[100];
     char* userName = getCurrentUserName();
     char uptimeStr[100];
-
+    //set up for CPU & Memory graphs
     setupPdhQuery();
     double elapsedTime = 0.0;
     double cpuUsage = 0.0;
     int memoryUsage = 0;
+    //Inner window
     Rectangle panelRec = { 5, 5, (float)screenWidth - 10, (float)screenHeight - 10 };
 
     // Graph data
@@ -51,8 +53,10 @@ int main() {
     int historyIndex = 0;
 
     while (!WindowShouldClose()) {
+        //keep track of time for graph
         double deltaTime = GetFrameTime();
         elapsedTime += deltaTime;
+
         //get user info
         getCurrentDateTime(dateTimeStr, sizeof(dateTimeStr));
         getSystemUptime(uptimeStr, sizeof(uptimeStr));
@@ -70,11 +74,11 @@ int main() {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        //internal window
+        //internal window initalization
         GuiPanel(panelRec, "Super Awesome System Activity Monitor");
         //title
         DrawText("SYSTEM MONITOR", 30, 70, 30, GetColor(0x3299b4ff));
-        //rectangles for graphs
+        //rectangles for graphs (not visible)
         Rectangle cpuGraphRec = { 50, 150, 300, 100 };
         DrawGraph(cpuHistory, GRAPH_HISTORY_LENGTH, cpuGraphRec, GetColor(0x81c0d0ff));
         Rectangle memoryGraphRec = { 50, 330, 300, 100 };
@@ -87,27 +91,25 @@ int main() {
         char memoryText[100];
         sprintf(memoryText, "Memory Usage: %d MB", memoryUsage);
         DrawText(memoryText, 50, 440, 20, GetColor(0x3299b4ff));
-
         //footer boxes:
         int boxHeight = 35;
         int boxY = screenHeight - boxHeight - 5;
-
-
+        //rectangle dimensions
         Rectangle box1 = { 10, boxY, 165, boxHeight };
         Rectangle box2 = { 10 + 165, boxY, 150, boxHeight };
         Rectangle box3 = { 10 + 165+150, boxY, 300, boxHeight };
         Rectangle box4 = { 10 + 165+150+300, boxY, 200, boxHeight };
         Rectangle box5 = { 10 + 165+150+300+200, boxY, 200, boxHeight };
         Rectangle box6 = { 10 + 165+150+300+200+200, boxY, screenWidth-165-150-300-200-200-20, boxHeight };
-
+        //draw the rectangles
         DrawRectangleRec(box1, GetColor(0x024658ff));
         DrawRectangleRec(box2, GetColor(0x024658ff));
         DrawRectangleRec(box3, GetColor(0x024658ff));
         DrawRectangleRec(box4, GetColor(0x024658ff));
         DrawRectangleRec(box5, GetColor(0x024658ff));
         DrawRectangleRec(box6, GetColor(0x024658ff));
-
-        int borderWidth = 1; // Width of the border
+        //rectangle borders
+        int borderWidth = 1;
         Color borderColor = GetColor(0x82cde0ff);
         DrawRectangleLinesEx(box1, borderWidth, borderColor);
         DrawRectangleLinesEx(box2, borderWidth, borderColor);
@@ -115,8 +117,7 @@ int main() {
         DrawRectangleLinesEx(box4, borderWidth, borderColor);
         DrawRectangleLinesEx(box5, borderWidth, borderColor);
         DrawRectangleLinesEx(box6, borderWidth, borderColor);
-
-
+        //text in rectangles
         DrawText("Current User: ", box1.x + 12, box1.y + 8, 18, GetColor(0x51bfd3ff));
         DrawText(userName, box2.x + 15, box2.y + 8, 18, GetColor(0x51bfd3ff));
         DrawText("CURRENT DATE & TIME: ", box3.x + 40, box3.y + 8, 18, GetColor(0x51bfd3ff));
