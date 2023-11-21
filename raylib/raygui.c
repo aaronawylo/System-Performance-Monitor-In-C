@@ -45,7 +45,7 @@ int main() {
     double cpuUsage = 0.0;
     int memoryUsage = 0;
     //Inner window
-    Rectangle panelRec = { 5, 5, (float)screenWidth - 10, (float)screenHeight - 10 };
+    Rectangle panelRec = { 5, 5, (float)screenWidth - 10, (float)screenHeight -10 };
 
     // Graph data
     int cpuHistory[GRAPH_HISTORY_LENGTH] = { 0 };
@@ -95,12 +95,12 @@ int main() {
         int boxHeight = 35;
         int boxY = screenHeight - boxHeight - 5;
         //rectangle dimensions
-        Rectangle box1 = { 10, boxY, 165, boxHeight };
-        Rectangle box2 = { 10 + 165, boxY, 150, boxHeight };
-        Rectangle box3 = { 10 + 165+150, boxY, 300, boxHeight };
-        Rectangle box4 = { 10 + 165+150+300, boxY, 200, boxHeight };
-        Rectangle box5 = { 10 + 165+150+300+200, boxY, 200, boxHeight };
-        Rectangle box6 = { 10 + 165+150+300+200+200, boxY, screenWidth-165-150-300-200-200-20, boxHeight };
+        Rectangle box1 = { 5, boxY, 200, boxHeight };
+        Rectangle box2 = { 5 + 200, boxY, 150, boxHeight };
+        Rectangle box3 = { 5 + 200+150, boxY, 275, boxHeight };
+        Rectangle box4 = { 5 + 200+150+275, boxY, 200, boxHeight };
+        Rectangle box5 = { 5 + 200+150+275+200, boxY, 200, boxHeight };
+        Rectangle box6 = { 5 + 200+150+275+200+200, boxY, screenWidth-165-150-300-200-200-20, boxHeight };
         //draw the rectangles
         DrawRectangleRec(box1, GetColor(0x024658ff));
         DrawRectangleRec(box2, GetColor(0x024658ff));
@@ -118,11 +118,11 @@ int main() {
         DrawRectangleLinesEx(box5, borderWidth, borderColor);
         DrawRectangleLinesEx(box6, borderWidth, borderColor);
         //text in rectangles
-        DrawText("Current User: ", box1.x + 12, box1.y + 8, 18, GetColor(0x51bfd3ff));
-        DrawText(userName, box2.x + 15, box2.y + 8, 18, GetColor(0x51bfd3ff));
-        DrawText("CURRENT DATE & TIME: ", box3.x + 40, box3.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText("CURRENT USER: ", box1.x + 20, box1.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText(userName, box2.x + 20, box2.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText("CURRENT DATE & TIME: ", box3.x + 20, box3.y + 8, 18, GetColor(0x51bfd3ff));
         DrawText(dateTimeStr, box4.x + 22, box4.y + 8, 18, GetColor(0x51bfd3ff));
-        DrawText("SYSTEM UPTIME: ", box5.x + 22, box5.y + 8, 18, GetColor(0x51bfd3ff));
+        DrawText("SYSTEM UPTIME: ", box5.x + 20, box5.y + 8, 18, GetColor(0x51bfd3ff));
         DrawText(uptimeStr, box6.x + 22, box6.y + 8, 18, GetColor(0x51bfd3ff));
 
         EndDrawing();
