@@ -72,45 +72,45 @@ double calculateTotalNetworkTraffic() {
     return GetNetworkSent() + GetNetworkReceived();
 }
 
-//int main() {
-//    // Initialize PDH Query
-//    setupPdhQuery();
-//    SetupSentQuery();
-//    SetupReceivedQuery();
-//
-//    struct PerformanceData *currentData = malloc(sizeof(struct PerformanceData));
-//    if (currentData == NULL) {
-//        perror("Error allocating memory");
-//        exit(EXIT_FAILURE);
-//    }
-//    int currentDataSize = 0;
-//
-//    // Infinite loop to continuously retrieve and process real-time data
-//    while (1) {
-//        // Get current time
-//        SYSTEMTIME localTime;
-//        GetLocalTime(&localTime);
-//        char timestamp[20];
-//        sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
-//                localTime.wYear, localTime.wMonth, localTime.wDay,
-//                localTime.wHour, localTime.wMinute, localTime.wSecond);
-//
-//        strcpy( currentData->timestamp, timestamp);
-//
-//        // Retrieve data
-//        currentData->cpu = getCurrentCpuUsage();
-//        currentData->memory = getMemoryUsage();
-//        currentData->diskIO = calculateDiskUsagePercentage();
-//        currentData->totalNetworkTraffic = calculateTotalNetworkTraffic();
-//
-//        currentDataSize++;
-//
-//        saveData(currentData, "performance_data.txt");
-//
-//        // Sleep for a short duration (e.g., 1 second) before the next iteration
-//        Sleep(1000);
-//    }
-//    // Free allocated memory before exiting
-//    free(currentData);
-//    return 0;
-//}
+int main() {
+    // Initialize PDH Query
+    setupPdhQuery();
+    SetupSentQuery();
+    SetupReceivedQuery();
+
+    struct PerformanceData *currentData = malloc(sizeof(struct PerformanceData));
+    if (currentData == NULL) {
+        perror("Error allocating memory");
+        exit(EXIT_FAILURE);
+    }
+    int currentDataSize = 0;
+
+    // Infinite loop to continuously retrieve and process real-time data
+    while (1) {
+        // Get current time
+        SYSTEMTIME localTime;
+        GetLocalTime(&localTime);
+        char timestamp[20];
+        sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+                localTime.wYear, localTime.wMonth, localTime.wDay,
+                localTime.wHour, localTime.wMinute, localTime.wSecond);
+
+        strcpy( currentData->timestamp, timestamp);
+
+        // Retrieve data
+        currentData->cpu = getCurrentCpuUsage();
+        currentData->memory = getMemoryUsage();
+        currentData->diskIO = calculateDiskUsagePercentage();
+        currentData->totalNetworkTraffic = calculateTotalNetworkTraffic();
+
+        currentDataSize++;
+
+        saveData(currentData, "performance_data.txt");
+
+        // Sleep for a short duration (e.g., 1 second) before the next iteration
+        Sleep(1000);
+    }
+    // Free allocated memory before exiting
+    free(currentData);
+    return 0;
+}
