@@ -72,7 +72,7 @@ double calculateTotalNetworkTraffic() {
     return GetNetworkSent() + GetNetworkReceived();
 }
 
-int main() {
+int dataMain() {
     // Initialize PDH Query
     setupPdhQuery();
     SetupSentQuery();
