@@ -37,7 +37,7 @@ double getDiskWrite(const char *diskName, DISK_PERFORMANCE diskPerformance) {
 //    printf("Disk %s - Free Bytes: %.2f MB\n", diskName, getDiskFreeSpace(free));
 //    printf("Disk %s - Available Bytes: %.2f MB\n", diskName, getDiskTotalFree(totalfree));
 //
-//     Read and write statistics for specified disk
+//    // Read and write statistics for specified disk
 //    HANDLE hDevice = CreateFile("\\\\.\\C:", 0, FILE_SHARE_READ | FILE_SHARE_WRITE,
 //                                NULL, OPEN_EXISTING, 0, NULL);
 //    if (hDevice == INVALID_HANDLE_VALUE) {

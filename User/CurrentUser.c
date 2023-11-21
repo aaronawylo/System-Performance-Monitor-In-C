@@ -23,16 +23,7 @@ char* getCurrentUserName() {
     if (!GetUserName(userName, &userNameSize)) {
         strcpy(userName, "Unknown User");
     }
-#else
-    uid_t uid = geteuid();
-    struct passwd *pw = getpwuid(uid);
-    if (pw) {
-        strcpy(userName, pw->pw_name);
-    } else {
-        strcpy(userName, "Unknown User");
-    }
 #endif
-
     return userName;
 }
 

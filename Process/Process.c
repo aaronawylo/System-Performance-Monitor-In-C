@@ -60,7 +60,7 @@ void PrintProcesses() {
     }
 }
 
-int processMain() {
+int main() {
     PrintProcesses();
     return 0;
 }

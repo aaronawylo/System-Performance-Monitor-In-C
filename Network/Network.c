@@ -3,7 +3,6 @@
 //
 #include <windows.h>
 #include <pdh.h>
-#include <stdio.h>
 #include "NetworkUtilities.h"
 
 #pragma comment(lib, "pdh.lib")

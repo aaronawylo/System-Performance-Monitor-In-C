@@ -5,15 +5,20 @@ include_directories("C:/raylib/raylib/src")
 link_directories("C:/raylib/raylib/src")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/CPU)
 
+set(CMAKE_C_STANDARD 11)
 
 add_executable(Term__Project__System_Monitor_
         CPU/CPUUtilities.h
         CPU/CPUUtilities.c
+        Data/ProcessingAndStorage.c
+        Data/ProcessingAndStorage.h
         Memory/Memory.h
         Memory/Memory.c
         Visualizer.c
         Process/Process.h
         Process/Process.c
+        Uptime/Uptime.c
+        Uptime/Uptime.h
         Disk_IO/DiskIO_monitoring.c
         Disk_IO/DiskIO_monitoring.h
         Network/Network.c
