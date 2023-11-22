@@ -23,15 +23,51 @@
 #include <psapi.h>
 
 // Function to get current RAM usage in kilobytes
-int getCurrentMemoryUsage() {
-    PROCESS_MEMORY_COUNTERS pmc;
+//int getCurrentMemoryUsage() {
+//    PROCESS_MEMORY_COUNTERS pmc;
+//
+//    if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
+//        // Return current RAM usage in kilobytes
+//        return (int)(pmc.WorkingSetSize / 1024);
+//    } else {
+//        // Error occurred
+//        fprintf(stderr, "Failed to retrieve memory information.\n");
+//        return -1;
+//    }
+//}
 
-    if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-        // Return current RAM usage in kilobytes
-        return (int)(pmc.WorkingSetSize / 1024);
+#include <windows.h>
+#include <stdio.h>
+
+// Function to get the total memory usage of all processes in kilobytes
+int getCurrentMemoryUsage() {
+    DWORD processes[1024];
+    DWORD cbNeeded;
+    if (EnumProcesses(processes, sizeof(processes), &cbNeeded)) {
+        // Calculate the number of processes
+        DWORD numProcesses = cbNeeded / sizeof(DWORD);
+
+        // Variables to store total memory usage
+        SIZE_T totalMemoryUsage = 0;
+
+        // Iterate through each process
+        for (DWORD i = 0; i < numProcesses; i++) {
+            HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processes[i]);
+            if (hProcess != NULL) {
+                PROCESS_MEMORY_COUNTERS pmc;
+                if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc))) {
+                    // Add the working set size to the total memory usage
+                    totalMemoryUsage += pmc.WorkingSetSize;
+                }
+                CloseHandle(hProcess);
+            }
+        }
+
+        // Convert total memory usage to kilobytes
+        return (int)(totalMemoryUsage / 1024);
     } else {
         // Error occurred
-        fprintf(stderr, "Failed to retrieve memory information.\n");
+        fprintf(stderr, "Failed to enumerate processes.\n");
         return -1;
     }
 }
@@ -43,7 +79,7 @@ int getTotalAvailableMemory() {
 
     if (GlobalMemoryStatusEx(&memoryStatus)) {
         // Return total available RAM in kilobytes
-        return (int)(memoryStatus.ullAvailPhys / 1024);
+        return (int)(memoryStatus.ullTotalPhys / 1024);
     } else {
         // Error occurred
         fprintf(stderr, "Failed to retrieve total available memory.\n");
@@ -58,22 +94,11 @@ double getMemoryUsagePercentage() {
 
     if (currentMemoryUsage >= 0 && totalAvailableMemory >= 0) {
         // Calculate the percentage of used memory
-        double percentage = ((double)currentMemoryUsage / totalAvailableMemory) * 100.0;
+        double percentage = ((double)currentMemoryUsage / (double)totalAvailableMemory) * 100.0;
         return percentage;
     } else {
         // Error occurred
         fprintf(stderr, "Failed to calculate memory usage percentage.\n");
         return -1.0;
     }
-}
-
-int main() {
-    // Call the function to get the percentage of RAM used
-    double usagePercentage = getMemoryUsagePercentage();
-
-    if (usagePercentage >= 0) {
-        printf("Memory Usage Percentage: %.2f%%\n", usagePercentage);
-    }
-
-    return 0;
 }

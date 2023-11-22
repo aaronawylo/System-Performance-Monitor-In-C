@@ -90,13 +90,19 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             HDC hdc = BeginPaint(hwnd, &ps);
 
             // Here you can add code to draw text or graphics
-            char text[100];
-            sprintf(text, "CPU Usage: %.2f%%", getCurrentCpuUsage());
-            TextOut(hdc, 10, 10, text, strlen(text));
-
+//            char text[100];
+//            sprintf(text, "CPU Usage: %.2f%%", getCurrentCpuUsage());
+//            TextOut(hdc, 10, 10, text, strlen(text));
+//
             char memText[100];
             sprintf(memText, "Memory Usage: %.2f%%", getMemoryUsagePercentage());
-            TextOut(hdc, 10, 30, text, strlen(memText));
+            TextOut(hdc, 10, 30, memText, strlen(memText));
+
+            char curMemText[100];
+            sprintf(curMemText, "Memory Usage: %d", getCurrentMemoryUsage());
+            TextOut(hdc, 10, 50, curMemText, strlen(curMemText));
+
+
             EndPaint(hwnd, &ps);
         }
             break;
