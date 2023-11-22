@@ -6,6 +6,8 @@ set(CMAKE_C_STANDARD 11)
 add_executable(Term__Project__System_Monitor_
         CPU/CPUUtilities.h
         CPU/CPUUtilities.c
+        Data/ProcessingAndStorage.c
+        Data/ProcessingAndStorage.h
         Memory/Memory.h
         Memory/Memory.c
         Visualizer.c
@@ -17,7 +19,6 @@ add_executable(Term__Project__System_Monitor_
         Disk_IO/DiskIO_monitoring.h
         Network/Network.c
         Network/NetworkUtilities.h
-        Disk_IO/DiskIO_monitoring.c
 )
 
 target_link_libraries(Term__Project__System_Monitor_ pdh wevtapi)
