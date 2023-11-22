@@ -5,14 +5,6 @@ void setupPdhQuery();
 double getCurrentCpuUsage();
 
 #endif // CPU_UTILITIES_H
-
-#ifndef TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
-#define TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
-
-int getMemoryUsage();
-
-#endif //TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
-
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
@@ -92,9 +84,6 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM 
             sprintf(text, "CPU Usage: %.2f%%", getCurrentCpuUsage());
             TextOut(hdc, 10, 10, text, strlen(text));
 
-            char memText[100];
-            sprintf(memText, "Memory Usage: %.2d", getMemoryUsage());
-            TextOut(hdc, 10, 30, memText, strlen(memText));
             EndPaint(hwnd, &ps);
         }
             break;
