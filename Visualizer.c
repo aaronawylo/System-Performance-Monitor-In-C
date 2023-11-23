@@ -9,70 +9,70 @@ double getCurrentCpuUsage();
 #ifndef TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
 #define TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
 
-int getMemoryUsage();
+int getCurrentMemoryUsage();
+int getTotalAvailableMemory();
+double getMemoryUsagePercentage();
 
-#endif // TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
+#endif //TERM__PROJECT__SYSTEM_MONITOR__MEMORY_H
 
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
 
+
 LRESULT CALLBACK WindowProcedure(HWND, UINT, WPARAM, LPARAM);
 
-char szClassName[] = "CPUUsageWindowClass";
+char szClassName[ ] = "CPUUsageWindowClass";
 
-int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nCmdShow)
-{
-    HWND hwnd;        /* This is the handle for our window */
-    MSG messages;     /* Here messages to the application are saved */
-    WNDCLASSEX wincl; /* Data structure for the windowclass */
+int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszArgument, int nCmdShow) {
+    HWND hwnd;               /* This is the handle for our window */
+    MSG messages;            /* Here messages to the application are saved */
+    WNDCLASSEX wincl;        /* Data structure for the windowclass */
 
     /* The Window structure */
     wincl.hInstance = hThisInstance;
     wincl.lpszClassName = szClassName;
-    wincl.lpfnWndProc = WindowProcedure; /* This function is called by windows */
-    wincl.style = CS_DBLCLKS;            /* Catch double-clicks */
+    wincl.lpfnWndProc = WindowProcedure;      /* This function is called by windows */
+    wincl.style = CS_DBLCLKS;                 /* Catch double-clicks */
     wincl.cbSize = sizeof(WNDCLASSEX);
 
     /* Use default icon and mouse-pointer */
     wincl.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
     wincl.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wincl.lpszMenuName = NULL; /* No menu */
-    wincl.cbClsExtra = 0;      /* No extra bytes after the window class */
-    wincl.cbWndExtra = 0;      /* structure or the window instance */
+    wincl.lpszMenuName = NULL;                /* No menu */
+    wincl.cbClsExtra = 0;                     /* No extra bytes after the window class */
+    wincl.cbWndExtra = 0;                     /* structure or the window instance */
     /* Use Windows's default color as the background of the window */
-    wincl.hbrBackground = (HBRUSH)COLOR_BACKGROUND;
+    wincl.hbrBackground = (HBRUSH) COLOR_BACKGROUND;
 
     /* Register the window class, and if it fails quit the program */
-    if (!RegisterClassEx(&wincl))
-        return 0;
+    if (!RegisterClassEx(&wincl)) return 0;
 
     /* The class is registered, let's create the program */
     hwnd = CreateWindowEx(
-        0,                           /* Extended possibilities for variation */
-        szClassName,                 /* Classname */
-        "Awesome CPU Usage Monitor", /* Title Text */
-        WS_OVERLAPPEDWINDOW,         /* default window */
-        CW_USEDEFAULT,               /* Windows decides the position */
-        CW_USEDEFAULT,               /* where the window ends up on the screen */
-        544,                         /* The programs width */
-        375,                         /* and height in pixels */
-        HWND_DESKTOP,                /* The window is a child-window to desktop */
-        NULL,                        /* No menu */
-        hThisInstance,               /* Program Instance handler */
-        NULL                         /* No Window Creation data */
+            0,                   /* Extended possibilities for variation */
+            szClassName,         /* Classname */
+            "Awesome CPU Usage Monitor", /* Title Text */
+            WS_OVERLAPPEDWINDOW, /* default window */
+            CW_USEDEFAULT,       /* Windows decides the position */
+            CW_USEDEFAULT,       /* where the window ends up on the screen */
+            544,                 /* The programs width */
+            375,                 /* and height in pixels */
+            HWND_DESKTOP,        /* The window is a child-window to desktop */
+            NULL,                /* No menu */
+            hThisInstance,       /* Program Instance handler */
+            NULL                 /* No Window Creation data */
     );
 
     /* Make the window visible on the screen */
     ShowWindow(hwnd, nCmdShow);
 
-    setupPdhQuery();              // Initialize PDH Query
+    setupPdhQuery();  // Initialize PDH Query
     SetTimer(hwnd, 1, 500, NULL); // Set a timer to update every half second
 
     /* Run the message loop. It will run until GetMessage() returns 0 */
-    while (GetMessage(&messages, NULL, 0, 0))
-    {
+    while (GetMessage(&messages, NULL, 0, 0)) {
         /* Translate virtual-key messages into character messages */
         TranslateMessage(&messages);
         /* Send message to WindowProcedure */
@@ -83,36 +83,38 @@ int WINAPI WinMain(HINSTANCE hThisInstance, HINSTANCE hPrevInstance, LPSTR lpszA
     return messages.wParam;
 }
 
-LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    switch (message)
-    {
-    case WM_PAINT:
-    {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hwnd, &ps);
+LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message) {
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            HDC hdc = BeginPaint(hwnd, &ps);
 
-        // Here you can add code to draw text or graphics
-        char text[100];
-        sprintf(text, "CPU Usage: %.2f%%", getCurrentCpuUsage());
-        TextOut(hdc, 10, 10, text, strlen(text));
+            // Here you can add code to draw text or graphics
+//            char text[100];
+//            sprintf(text, "CPU Usage: %.2f%%", getCurrentCpuUsage());
+//            TextOut(hdc, 10, 10, text, strlen(text));
+//
+            char memText[100];
+            sprintf(memText, "Memory Usage: %.2f%%", getMemoryUsagePercentage());
+            TextOut(hdc, 10, 30, memText, strlen(memText));
 
-        char memText[100];
-        sprintf(memText, "Memory Usage: %.2d", getMemoryUsage());
-        TextOut(hdc, 10, 30, memText, strlen(memText));
-        EndPaint(hwnd, &ps);
-    }
-    break;
-    case WM_TIMER:
-    {
-        InvalidateRect(hwnd, NULL, TRUE); // Force window to be redrawn
-    }
-    break;
-    case WM_DESTROY:
-        PostQuitMessage(0); /* send a WM_QUIT to the message queue */
-        break;
-    default: /* for messages that we don't deal with */
-        return DefWindowProc(hwnd, message, wParam, lParam);
+            char curMemText[100];
+            sprintf(curMemText, "Memory Usage: %d", getCurrentMemoryUsage());
+            TextOut(hdc, 10, 50, curMemText, strlen(curMemText));
+
+
+            EndPaint(hwnd, &ps);
+        }
+            break;
+        case WM_TIMER: {
+            InvalidateRect(hwnd, NULL, TRUE); // Force window to be redrawn
+        }
+            break;
+        case WM_DESTROY:
+            PostQuitMessage(0); /* send a WM_QUIT to the message queue */
+            break;
+        default: /* for messages that we don't deal with */
+            return DefWindowProc(hwnd, message, wParam, lParam);
     }
 
     return 0;
