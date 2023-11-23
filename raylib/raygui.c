@@ -115,6 +115,8 @@ int main() {
     setupPdhQuery();
     SetupSentQuery();
     SetupReceivedQuery();
+    setupReadWriteQuery();
+
     double elapsedTime = 0.0;
     double cpuUsage = 0.0;
     double memoryUsage = 0.0;
@@ -124,6 +126,12 @@ int main() {
     double networkSent = 0.0;
     double networkReceived = 0.0;
 
+    // Setup for performance data log
+    struct PerformanceData *currentData = malloc(sizeof(struct PerformanceData));
+    if (currentData == NULL) {
+        perror("Error allocating memory");
+        exit(EXIT_FAILURE);
+    }
 
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
@@ -155,9 +163,21 @@ int main() {
             cpuUsage = getCurrentCpuUsage();
             memoryUsage = getMemoryUsagePercentage();
             diskUsage = calculateDiskUsagePercentage();
+            diskRead = getDiskRead();
+            diskWrite = getDiskWrite();
             networkSent = GetNetworkSent();
             networkReceived = GetNetworkReceived();
             PrintProcesses(processList, 100, &numProcesses);
+
+            // Retrieve data
+            strcpy( currentData->timestamp, dateTimeStr);
+            currentData->cpu = cpuUsage;
+            currentData->memory = memoryUsage;
+            currentData->diskUsage = diskUsage;
+            currentData->networkSent = networkSent;
+            currentData->networkReceived = networkReceived;
+
+            saveData(currentData, "performance_data.txt");
 
             cpuHistory[historyIndex] = (int) (cpuUsage * 10);
             memoryHistory[historyIndex] = (int) memoryUsage;
@@ -210,7 +230,7 @@ int main() {
         DrawText(memoryText, 50, 440, 20, GetColor(0x3299b4ff));
         //text for disk
         char diskText[100];
-        sprintf(cpuText, "Disk Usage: %.2f%%", diskUsage);
+        sprintf(cpuText, "Disk (C:) Usage: %.2f%%", diskUsage);
         DrawText(cpuText, 400, 260, 20, GetColor(0x3299b4ff));
         //text for network sent
         sprintf(cpuText, "Network Sent: %.2fMB", networkSent);
@@ -219,6 +239,12 @@ int main() {
         sprintf(cpuText, "Network Recieved: %.2fMB", networkReceived);
         DrawText(cpuText, 400, 660, 20, GetColor(0x3299b4ff));
 
+        char diskReadText[100];
+        sprintf(cpuText, "Disk (C:) Read Bytes: %.2f B", diskRead);
+        DrawText(cpuText, 400, 310, 20, GetColor(0x3299b4ff));
+        char diskWriteText[100];
+        sprintf(cpuText, "Disk (C:) Write Bytes: %.2f B", diskWrite);
+        DrawText(cpuText, 400, 335, 20, GetColor(0x3299b4ff));
 
         //print processes
         Font customFont = GetFontDefault();
