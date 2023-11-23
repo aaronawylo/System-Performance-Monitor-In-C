@@ -192,8 +192,14 @@ int main() {
         DrawText(memoryText, 50, 440, 20, GetColor(0x3299b4ff));
         //text for disk
         char diskText[100];
-        sprintf(cpuText, "Disk Usage: %.2f%%", diskUsage);
+        sprintf(cpuText, "Disk (C:) Usage: %.2f%%", diskUsage);
         DrawText(cpuText, 400, 260, 20, GetColor(0x3299b4ff));
+        char diskReadText[100];
+        sprintf(cpuText, "Disk (C:) Read Bytes: %.2f B", diskRead);
+        DrawText(cpuText, 400, 310, 20, GetColor(0x3299b4ff));
+        char diskWriteText[100];
+        sprintf(cpuText, "Disk (C:) Write Bytes: %.2f B", diskWrite);
+        DrawText(cpuText, 400, 335, 20, GetColor(0x3299b4ff));
 
         //print processes
         Font customFont = GetFontDefault();
