@@ -1,6 +1,7 @@
 #define RAYGUI_IMPLEMENTATION
 #define UPDATE_INTERVAL 1.0
 #define GRAPH_HISTORY_LENGTH 100
+#define NETWORK_HISTORY_LENGTH 100
 
 #include "raylib.h"
 #include "raygui.h"
@@ -17,7 +18,7 @@
 
 void DrawGraph(const int *values, int count, Rectangle bounds, Color color) {
     if (count > 1) {
-        int maxValue = 0;
+        int maxValue = 100;
         for (int i = 0; i < count; i++) {
             if (values[i] > maxValue) maxValue = values[i];
         }
@@ -31,6 +32,28 @@ void DrawGraph(const int *values, int count, Rectangle bounds, Color color) {
         }
     }
 }
+
+void DrawGraphDouble(const double *values, int count, Rectangle bounds, Color color) {
+    if (count > 1) {
+        double maxValue = 0.0;
+        for (int i = 0; i < count; i++) {
+            if (values[i] > maxValue) maxValue = values[i];
+        }
+
+        for (int i = 1; i < count; i++) {
+            Vector2 startPos = {
+                    bounds.x + (bounds.width / (double)count) * (i - 1),
+                    bounds.y + bounds.height - (values[i - 1] / maxValue) * bounds.height
+            };
+            Vector2 endPos = {
+                    bounds.x + (bounds.width / (double)count) * i,
+                    bounds.y + bounds.height - (values[i] / maxValue) * bounds.height
+            };
+            DrawLineV(startPos, endPos, color);
+        }
+    }
+}
+
 
 void DrawMainContentGrid(Rectangle bounds, int spacing, int subdivs) {
     Vector2 mouseCell = {0, 0};
@@ -101,6 +124,7 @@ int main() {
     double networkSent = 0.0;
     double networkReceived = 0.0;
 
+
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
     //close button
@@ -109,9 +133,12 @@ int main() {
     int cpuHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int memoryHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int diskHistory[GRAPH_HISTORY_LENGTH] = { 0 };
-    int networkSentHistory[GRAPH_HISTORY_LENGTH] = { 0 };
-    int networkReceivedHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    double networkSentHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    double networkReceivedHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+
+    int networkHistoryIndex = 0;
     int historyIndex = 0;
+
     ProcessInfo processList[100];
     int numProcesses = 0;
 
@@ -135,8 +162,10 @@ int main() {
             cpuHistory[historyIndex] = (int) (cpuUsage * 10);
             memoryHistory[historyIndex] = (int) memoryUsage;
             diskHistory[historyIndex] = (int) diskUsage;
-            networkSentHistory[historyIndex] = (int) networkSent;
-            networkReceivedHistory[historyIndex] = (int) networkReceived;
+            networkSentHistory[networkHistoryIndex] = GetNetworkSent();
+            networkReceivedHistory[networkHistoryIndex] = GetNetworkReceived();
+
+            networkHistoryIndex = (networkHistoryIndex + 1) % NETWORK_HISTORY_LENGTH;
 
             historyIndex = (historyIndex + 1) % GRAPH_HISTORY_LENGTH;
             elapsedTime = 0.0;
@@ -161,8 +190,16 @@ int main() {
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, memoryGraphRec, GetColor(0x81c0d0ff));
         Rectangle diskGraphRec = {400, 150, 300, 100};
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, diskGraphRec, GetColor(0x81c0d0ff));
-        Rectangle networkGraphRec = {400, 330, 300, 100};
-        DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, networkGraphRec, GetColor(0x81c0d0ff));
+//        Rectangle networkGraphRec = {400, 330, 300, 100};
+//        DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, networkGraphRec, GetColor(0x81c0d0ff));
+
+
+        Rectangle networkSentGraphRec = {400, 330, 300, 100};
+        Rectangle networkReceivedGraphRec = {400, 530, 300, 100};
+        DrawGraphDouble(networkSentHistory, NETWORK_HISTORY_LENGTH, networkSentGraphRec, GetColor(0x81c0d0ff));
+        DrawGraphDouble(networkReceivedHistory, NETWORK_HISTORY_LENGTH, networkReceivedGraphRec, GetColor(0x81c0d0ff));
+
+
         //text for CPU
         char cpuText[100];
         sprintf(cpuText, "CPU Usage: %.2f%%", cpuUsage);
@@ -175,6 +212,13 @@ int main() {
         char diskText[100];
         sprintf(cpuText, "Disk Usage: %.2f%%", diskUsage);
         DrawText(cpuText, 400, 260, 20, GetColor(0x3299b4ff));
+        //text for network sent
+        sprintf(cpuText, "Network Sent: %.2fMB", networkSent);
+        DrawText(cpuText, 400, 440, 20, GetColor(0x3299b4ff));
+        //text for network recieved
+        sprintf(cpuText, "Network Recieved: %.2fMB", networkReceived);
+        DrawText(cpuText, 400, 660, 20, GetColor(0x3299b4ff));
+
 
         //print processes
         Font customFont = GetFontDefault();
