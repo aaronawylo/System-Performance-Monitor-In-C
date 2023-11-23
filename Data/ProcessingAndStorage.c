@@ -3,7 +3,6 @@
 //
 
 #include <windows.h>
-#include <pdh.h>
 #include "ProcessingAndStorage.h"
 #include "../CPU/CPUUtilities.h"
 #include "../Network/NetworkUtilities.h"
@@ -14,103 +13,69 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_RECORDS 50
-
-// Define a structure to represent performance data
-struct PerformanceData {
-    char timestamp[20];
-    double cpu;
-    int memory;
-    double diskIO;
-    double totalNetworkTraffic;
-};
-
 // Function to save data to a file
 void saveData(struct PerformanceData *data, const char *filename) {
-    FILE *file = fopen(filename, "a");
+   FILE *file = fopen(filename, "a");
 
-    if (file == NULL) {
-        perror("Error opening file");
-        exit(EXIT_FAILURE);
-    }
+   if (file == NULL) {
+       perror("Error opening file");
+       exit(EXIT_FAILURE);
+   }
 
-    fprintf(file, "Timestamp: %s\n"
-                  "CPU Usage: %.2lf\n"
-                  "Memory Usage: %d\n"
-                  "Disk Usage: %.2lf\n"
-                  "Total Network Traffic: %.2lf\n\n",
-            data->timestamp, data->cpu, data->memory,
-            data->diskIO, data->totalNetworkTraffic);
+   fprintf(file, "Timestamp: %s\n"
+                 "CPU Usage: %.2lf%\n"
+                 "Memory Usage: %.2lf%\n"
+                 "Disk Usage: %.2lf%\n"
+                 "Network Sent: %.2lf\n"
+                 "Network Received: %.2lf\n\n",
+           data->timestamp, data->cpu, data->memory,
+           data->diskUsage, data->networkSent, data->networkReceived);
 
-    fclose(file);
+
+   fclose(file);
 }
 
-double calculateDiskUsagePercentage() {
-    char diskName[] = "C:";
 
-    ULARGE_INTEGER free, total, totalfree;
+int mainData() {
+   // Initialize PDH Query
+   setupPdhQuery();
+   SetupSentQuery();
+   SetupReceivedQuery();
 
-    if (!GetDiskFreeSpaceEx(diskName, &total, &totalfree, &free)) {
-//    DWORD sectorsPerCluster, bytesPerSector, freeClusters, totalClusters;
-//    if (!GetDiskFreeSpace(diskName, &sectorsPerCluster, &bytesPerSector, &freeClusters, &totalClusters)) {
-        DWORD error = GetLastError();
-        fprintf(stderr, "Error getting disk space. Error code: %lu\n", error);
-        return -1.0;
-    }
+   struct PerformanceData *currentData = malloc(sizeof(struct PerformanceData));
+   if (currentData == NULL) {
+       perror("Error allocating memory");
+       exit(EXIT_FAILURE);
+   }
+   int currentDataSize = 0;
 
-    double diskTotal = getDiskTotal(total);
-    double diskTotalFree = getDiskTotalFree(totalfree);
+   // Infinite loop to continuously retrieve and process real-time data
+   while (1) {
+       // Get current time
+       SYSTEMTIME localTime;
+       GetLocalTime(&localTime);
+       char timestamp[20];
+       sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
+               localTime.wYear, localTime.wMonth, localTime.wDay,
+               localTime.wHour, localTime.wMinute, localTime.wSecond);
 
-    if (diskTotal > 0) {
-        return ((diskTotal - diskTotalFree) / diskTotal) * 100;
-    } else {
-        return 0.0;
-    }
-}
+       strcpy( currentData->timestamp, timestamp);
 
-double calculateTotalNetworkTraffic() {
-    return GetNetworkSent() + GetNetworkReceived();
-}
+       // Retrieve data
+       currentData->cpu = getCurrentCpuUsage();
+       currentData->memory = getMemoryUsagePercentage();
+       currentData->diskUsage = calculateDiskUsagePercentage();
+       currentData->networkSent = GetNetworkSent();
+       currentData->networkReceived = GetNetworkReceived();
 
-int dataMain() {
-    // Initialize PDH Query
-    setupPdhQuery();
-    SetupSentQuery();
-    SetupReceivedQuery();
+       currentDataSize++;
 
-    struct PerformanceData *currentData = malloc(sizeof(struct PerformanceData));
-    if (currentData == NULL) {
-        perror("Error allocating memory");
-        exit(EXIT_FAILURE);
-    }
-    int currentDataSize = 0;
+       saveData(currentData, "performance_data.txt");
 
-    // Infinite loop to continuously retrieve and process real-time data
-    while (1) {
-        // Get current time
-        SYSTEMTIME localTime;
-        GetLocalTime(&localTime);
-        char timestamp[20];
-        sprintf(timestamp, "%04d-%02d-%02d %02d:%02d:%02d",
-                localTime.wYear, localTime.wMonth, localTime.wDay,
-                localTime.wHour, localTime.wMinute, localTime.wSecond);
-
-        strcpy( currentData->timestamp, timestamp);
-
-        // Retrieve data
-        currentData->cpu = getCurrentCpuUsage();
-        currentData->memory = getMemoryUsage();
-        currentData->diskIO = calculateDiskUsagePercentage();
-        currentData->totalNetworkTraffic = calculateTotalNetworkTraffic();
-
-        currentDataSize++;
-
-        saveData(currentData, "performance_data.txt");
-
-        // Sleep for a short duration (e.g., 1 second) before the next iteration
-        Sleep(1000);
-    }
-    // Free allocated memory before exiting
-    free(currentData);
-    return 0;
+       // Sleep for a short duration (e.g., 1 second) before the next iteration
+       Sleep(1000);
+   }
+   // Free allocated memory before exiting
+   free(currentData);
+   return 0;
 }
