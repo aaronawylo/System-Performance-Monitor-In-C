@@ -15,8 +15,6 @@ add_executable(Term__Project__System_Monitor_
         Memory/Memory.h
         Memory/Memory.c
         Visualizer.c
-        Process/Process.h
-        Process/Process.c
         Disk_IO/DiskIO_monitoring.c
         Disk_IO/DiskIO_monitoring.h
         Network/Network.c
@@ -27,6 +25,8 @@ add_executable(Term__Project__System_Monitor_
         raylib/style_cyber.h
         User/CurrentUser.c
         User/CurrentUser.h
+        Process/Process.c
+        Process/Process.h
 )
 
 target_link_libraries(Term__Project__System_Monitor_ raylib winmm pdh wevtapi)

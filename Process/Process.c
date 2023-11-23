@@ -3,6 +3,13 @@
 #include <psapi.h>
 #include <stdio.h>
 
+
+typedef struct {
+    DWORD processId;
+    char processName[MAX_PATH];
+    char status[10];
+} ProcessInfo;
+
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
     DWORD lpdwProcessId;
     GetWindowThreadProcessId(hwnd, &lpdwProcessId);
@@ -22,7 +29,7 @@ BOOL IsUserApplication(DWORD processID) {
     return !EnumWindows(EnumWindowsProc, (LPARAM) processID);
 }
 
-void PrintProcesses() {
+void PrintProcesses(ProcessInfo *processList, int maxProcesses, int *numProcesses) {
     DWORD processes[1024], needed, cProcesses;
     unsigned int i;
 
@@ -32,12 +39,9 @@ void PrintProcesses() {
     }
 
     cProcesses = needed / sizeof(DWORD);
+    *numProcesses = 0; // Reset the count of processes
 
-//    printf("Number of processes: %u\n", cProcesses);
-    printf("%-15s%-30s%-10s\n", "Process ID", "Process Name", "Running");
-    printf("--------------------------------------------------------------------------------\n");
-
-    for (i = 0; i < cProcesses; i++) {
+    for (i = 0; i < cProcesses && *numProcesses < maxProcesses; i++) {
         if (processes[i] != 0) {
             char processName[MAX_PATH] = "<unknown>";
             HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processes[i]);
@@ -51,7 +55,10 @@ void PrintProcesses() {
                 }
 
                 if (strcmp(processName, "<unknown>") != 0 && IsUserApplication(processes[i])) {
-                    printf("%-15lu%-30s%-10s\n", processes[i], processName, "Running");
+                    processList[*numProcesses].processId = processes[i];
+                    strcpy(processList[*numProcesses].processName, processName);
+                    strcpy(processList[*numProcesses].status, "Running");
+                    (*numProcesses)++;
                 }
 
                 CloseHandle(hProcess);
@@ -59,6 +66,7 @@ void PrintProcesses() {
         }
     }
 }
+
 
 //int main() {
 //    PrintProcesses();

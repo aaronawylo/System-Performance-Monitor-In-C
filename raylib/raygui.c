@@ -11,6 +11,7 @@
 #include "../User/CurrentUser.h"
 #include "../Data/ProcessingAndStorage.h"
 #include "../Network/NetworkUtilities.h"
+#include "../Process/Process.h"
 
 
 void DrawGraph(int *values, int count, Rectangle bounds, Color color) {
@@ -58,9 +59,12 @@ int main() {
     SetupReceivedQuery();
     double elapsedTime = 0.0;
     double cpuUsage = 0.0;
-    int memoryUsage = 0;
+    double memoryUsage = 0;
     double diskUsage = 0.0;
     double totalNetworkTraffic = 0.0;
+    //process info
+    ProcessInfo processList[100];
+    int numProcesses = 0;
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
     //close button
@@ -83,7 +87,7 @@ int main() {
 
         if (elapsedTime >= UPDATE_INTERVAL) {
             cpuUsage = getCurrentCpuUsage();
-            memoryUsage = getMemoryUsage();
+            memoryUsage = getMemoryUsagePercentage();
             diskUsage = calculateDiskUsagePercentage();
             totalNetworkTraffic = calculateTotalNetworkTraffic();
 
@@ -123,7 +127,7 @@ int main() {
         DrawText(cpuText, 50, 260, 20, GetColor(0x3299b4ff));
         //text for memory
         char memoryText[100];
-        sprintf(memoryText, "Memory Usage: %d MB", memoryUsage);
+        sprintf(memoryText, "Memory Usage: %.2f%%", memoryUsage);
         DrawText(memoryText, 50, 440, 20, GetColor(0x3299b4ff));
         //text for disk
         char diskText[100];

@@ -12,4 +12,5 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
 BOOL IsUserApplication(DWORD processID);
 void PrintProcesses();
 
+
 #endif // PROCESS_UTILS_H
