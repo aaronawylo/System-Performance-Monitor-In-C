@@ -12,6 +12,7 @@
 #include "../Data/ProcessingAndStorage.h"
 #include "../Network/NetworkUtilities.h"
 #include "../Process/Process.h"
+#include "../Disk_IO/DiskIO_monitoring.h"
 
 
 void DrawGraph(const int *values, int count, Rectangle bounds, Color color) {
@@ -93,9 +94,12 @@ int main() {
     SetupReceivedQuery();
     double elapsedTime = 0.0;
     double cpuUsage = 0.0;
-    double memoryUsage = 0;
+    double memoryUsage = 0.0;
     double diskUsage = 0.0;
-    double totalNetworkTraffic = 0.0;
+    double diskRead = 0.0;
+    double diskWrite = 0.0;
+    double networkSent = 0.0;
+    double networkReceived = 0.0;
 
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
@@ -105,7 +109,8 @@ int main() {
     int cpuHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int memoryHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int diskHistory[GRAPH_HISTORY_LENGTH] = { 0 };
-    int networkHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    int networkSentHistory[GRAPH_HISTORY_LENGTH] = { 0 };
+    int networkReceivedHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int historyIndex = 0;
     ProcessInfo processList[100];
     int numProcesses = 0;
@@ -123,13 +128,15 @@ int main() {
             cpuUsage = getCurrentCpuUsage();
             memoryUsage = getMemoryUsagePercentage();
             diskUsage = calculateDiskUsagePercentage();
-            totalNetworkTraffic = calculateTotalNetworkTraffic();
+            networkSent = GetNetworkSent();
+            networkReceived = GetNetworkReceived();
             PrintProcesses(processList, 100, &numProcesses);
 
             cpuHistory[historyIndex] = (int) (cpuUsage * 10);
-            memoryHistory[historyIndex] = memoryUsage;
+            memoryHistory[historyIndex] = (int) memoryUsage;
             diskHistory[historyIndex] = (int) diskUsage;
-            networkHistory[historyIndex] = (int) totalNetworkTraffic;
+            networkSentHistory[historyIndex] = (int) networkSent;
+            networkReceivedHistory[historyIndex] = (int) networkReceived;
 
             historyIndex = (historyIndex + 1) % GRAPH_HISTORY_LENGTH;
             elapsedTime = 0.0;
@@ -168,10 +175,6 @@ int main() {
         char diskText[100];
         sprintf(cpuText, "Disk Usage: %.2f%%", diskUsage);
         DrawText(cpuText, 400, 260, 20, GetColor(0x3299b4ff));
-        //text for network
-        char networkText[100];
-        sprintf(memoryText, "Total Network Traffic: %lf MB", totalNetworkTraffic);
-        DrawText(memoryText, 400, 440, 20, GetColor(0x3299b4ff));
 
         //print processes
         Font customFont = GetFontDefault();
