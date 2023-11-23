@@ -27,6 +27,26 @@ double getDiskWrite(const char *diskName, DISK_PERFORMANCE diskPerformance) {
     return writeRate;
 }
 
+double calculateDiskUsagePercentage() {
+    char diskName[] = "C:\\";
+    ULARGE_INTEGER total, free, totalfree;
+
+    if (!GetDiskFreeSpaceEx(diskName, &free, &total, &totalfree)) {
+        printf("Error getting disk space information\n");
+        return 1;
+    }
+    GetDiskFreeSpaceEx(diskName, &free, &total,
+                       &totalfree);
+
+    double diskTotal = getDiskTotal(total);
+    double diskTotalFree = getDiskTotalFree(totalfree);
+
+    if (diskTotal > 0) {
+        return ((diskTotal - diskTotalFree) / diskTotal) * 100;
+    } else {
+        return 1;
+    }
+}
 
 int main() {
     char diskName[] = "C:\\";

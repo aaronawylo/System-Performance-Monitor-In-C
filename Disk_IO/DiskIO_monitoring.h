@@ -11,5 +11,6 @@ double getDiskFreeSpace(ULARGE_INTEGER free);
 double getDiskTotalFree();
 double getDiskRead();
 double getDiskWrite();
+double calculateDiskUsagePercentage();
 
 #endif //DISKIO_MONITORING_H
