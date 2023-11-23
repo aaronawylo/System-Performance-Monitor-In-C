@@ -137,6 +137,8 @@ int main() {
             cpuUsage = getCurrentCpuUsage();
             memoryUsage = getMemoryUsagePercentage();
             diskUsage = calculateDiskUsagePercentage();
+            diskRead = getDiskRead();
+            diskWrite = getDiskWrite();
             networkSent = GetNetworkSent();
             networkReceived = GetNetworkReceived();
             PrintProcesses(processList, 100, &numProcesses);
