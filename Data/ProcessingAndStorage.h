@@ -5,9 +5,14 @@
 #ifndef DATA_PROCESSING_AND_STORAGE_H
 #define DATA_PROCESSING_AND_STORAGE_H
 
-struct PerformanceData;
+struct PerformanceData {
+    char timestamp[20];
+    double cpu;
+    double memory;
+    double diskUsage;
+    double networkSent;
+    double networkReceived;
+};
 void saveData(struct PerformanceData *data, const char *filename);
-double calculateDiskUsagePercentage();
-double calculateTotalNetworkTraffic();
 
 #endif // DATA_PROCESSING_AND_STORAGE_H

@@ -5,11 +5,9 @@
 #ifndef DISKIO_MONITORING_H
 #define DISKIO_MONITORING_H
 
-
-double getDiskTotal(ULARGE_INTEGER total);
-double getDiskFreeSpace(ULARGE_INTEGER free);
-double getDiskTotalFree();
+void setupReadWriteQuery();
 double getDiskRead();
 double getDiskWrite();
+double calculateDiskUsagePercentage();
 
 #endif //DISKIO_MONITORING_H
