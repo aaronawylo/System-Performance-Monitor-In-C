@@ -39,6 +39,40 @@ void DrawMainContentGrid(Rectangle bounds, int spacing, int subdivs) {
     }
 }
 
+void DrawProcessList(ProcessInfo *processList, int numProcesses, int startX, int startY, Font font, int fontSize) {
+    // column widths
+    int pidColumnWidth = 100;
+    int nameColumnWidth = 400;
+    const char* headers[] = {"PID", "Name"};
+    int headerSpacing = 20;
+
+    //draw headers
+    for (int i = 0; i < 2; i++) { // Adjusted loop to 2 since there are only two headers now
+        int columnX = startX + (i == 0 ? 0 : pidColumnWidth);
+        DrawTextEx(font, headers[i], (Vector2){columnX, startY}, fontSize, 1, GetColor(0x3299b4ff));
+    }
+
+    int headerStartY = startY;
+    startY += headerSpacing + 10;
+    int outerBoxHeight = (numProcesses + 1) * (fontSize + 5);
+
+    // draw the outer box
+    Rectangle outerBox = {startX - 25, headerStartY - 15, pidColumnWidth + nameColumnWidth + 20, outerBoxHeight + 30};
+    DrawRectangleLinesEx(outerBox, 1, GetColor(0x024658ff));
+
+    for (int i = 0; i < numProcesses; i++) {
+        char pid[32], name[256];
+        sprintf(pid, "%lu", processList[i].processId);
+        sprintf(name, "%s", processList[i].processName);
+
+        //draw the PID's and names
+        DrawTextEx(font, pid, (Vector2){startX, startY + i * (fontSize + 5)}, fontSize, 1, GetColor(0x3299b4ff));
+        DrawTextEx(font, name, (Vector2){startX + pidColumnWidth, startY + i * (fontSize + 5)}, fontSize, 1, GetColor(0x3299b4ff));
+    }
+}
+
+
+
 int main() {
     //application window size
     int screenWidth = 1400;
@@ -92,7 +126,7 @@ int main() {
             totalNetworkTraffic = calculateTotalNetworkTraffic();
             PrintProcesses(processList, 100, &numProcesses);
 
-            cpuHistory[historyIndex] = (int)(cpuUsage * 10);
+            cpuHistory[historyIndex] = (int) (cpuUsage * 10);
             memoryHistory[historyIndex] = memoryUsage;
             diskHistory[historyIndex] = (int) diskUsage;
             networkHistory[historyIndex] = (int) totalNetworkTraffic;
@@ -106,21 +140,21 @@ int main() {
         //internal window initalization
         GuiWindowBox(panelRec, "Super Awesome Activiy Monitor");
         //title
-        DrawText("SYSTEM MONITOR", 30, 70, 30, GetColor(0x3299b4ff));
-        //GUI grid -
-        Rectangle mainContentBounds = { 5, 5, screenWidth - 10, screenHeight- 10  }; // Adjust as needed
-        int mainContentSpacing = 25;
-        int mainContentSubdivs = 6;
-//        DrawMainContentGrid(mainContentBounds, mainContentSpacing, mainContentSubdivs);
+        DrawText("SYSTEM MONITOR", 40, 70, 40, GetColor(0x3299b4ff));
+//        //GUI grid -
+//        Rectangle mainContentBounds = {5, 5, screenWidth - 10, screenHeight - 10}; // Adjust as needed
+//        int mainContentSpacing = 25;
+//        int mainContentSubdivs = 6;
+////        DrawMainContentGrid(mainContentBounds, mainContentSpacing, mainContentSubdivs);
 
         //rectangles for graphs (not visible)
-        Rectangle cpuGraphRec = { 50, 150, 300, 100 };
+        Rectangle cpuGraphRec = {50, 150, 300, 100};
         DrawGraph(cpuHistory, GRAPH_HISTORY_LENGTH, cpuGraphRec, GetColor(0x81c0d0ff));
-        Rectangle memoryGraphRec = { 50, 330, 300, 100 };
+        Rectangle memoryGraphRec = {50, 330, 300, 100};
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, memoryGraphRec, GetColor(0x81c0d0ff));
-        Rectangle diskGraphRec = { 400, 150, 300, 100 };
+        Rectangle diskGraphRec = {400, 150, 300, 100};
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, diskGraphRec, GetColor(0x81c0d0ff));
-        Rectangle networkGraphRec = { 400, 330, 300, 100 };
+        Rectangle networkGraphRec = {400, 330, 300, 100};
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, networkGraphRec, GetColor(0x81c0d0ff));
         //text for CPU
         char cpuText[100];
@@ -140,16 +174,12 @@ int main() {
         DrawText(memoryText, 400, 440, 20, GetColor(0x3299b4ff));
 
         //print processes
-        for (int i = 0; i < numProcesses; i++) {
-            char processInfo[512];
-            sprintf(processInfo, "ID: %lu, Name: %s, Status: %s",
-                    processList[i].processId,
-                    processList[i].processName,
-                    processList[i].status);
-
-            GuiLabel((Rectangle){50, 500 + i * 20, 400, 20}, processInfo);
-        }
-
+        Font customFont = GetFontDefault();
+        int fontSize = 20;
+        char processText[100];
+        sprintf(processText, "Applications:");
+        DrawText(processText, 860, 140, 30, GetColor(0x3299b4ff));
+        DrawProcessList(processList, numProcesses, 875, 200, customFont, fontSize);
 
         //footer boxes:
         int boxHeight = 35;
