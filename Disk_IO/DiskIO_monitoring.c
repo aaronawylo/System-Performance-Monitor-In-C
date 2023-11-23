@@ -1,6 +1,25 @@
 #include <stdio.h>
 #include <windows.h>
 
+DISK_PERFORMANCE diskPerformance;
+char diskName[] = "C:\\";
+
+void setupReadWriteQuery() {
+    // Read and write statistics for specified disk
+    HANDLE hDevice = CreateFile("\\\\.\\C:", 0, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                NULL, OPEN_EXISTING, 0, NULL);
+    if (hDevice == INVALID_HANDLE_VALUE) {
+        printf("Error opening disk\n");
+    }
+
+    DWORD bytesReturned;
+    if (!DeviceIoControl(hDevice, IOCTL_DISK_PERFORMANCE, NULL, 0,
+                         &diskPerformance, sizeof(diskPerformance),
+                         &bytesReturned, NULL)) {
+        printf("Error getting disk performance\n");
+        CloseHandle(hDevice);
+    }
+}
 
 double getDiskTotal(ULARGE_INTEGER total) {
     double diskTotal = (double) total.QuadPart / (1024 * 1024);
@@ -17,18 +36,17 @@ double getDiskTotalFree(ULARGE_INTEGER totalfree) {
     return diskTotalFree;
 }
 
-double getDiskRead(const char *diskName, DISK_PERFORMANCE diskPerformance) {
+double getDiskRead() {
     double readRate = (double) diskPerformance.BytesRead.QuadPart / (1024 * 1024);
     return readRate;
 }
 
-double getDiskWrite(const char *diskName, DISK_PERFORMANCE diskPerformance) {
+double getDiskWrite() {
     double writeRate = (double) diskPerformance.BytesWritten.QuadPart / (1024 * 1024);
     return writeRate;
 }
 
 double calculateDiskUsagePercentage() {
-    char diskName[] = "C:\\";
     ULARGE_INTEGER total, free, totalfree;
 
     if (!GetDiskFreeSpaceEx(diskName, &free, &total, &totalfree)) {
@@ -48,8 +66,7 @@ double calculateDiskUsagePercentage() {
     }
 }
 
-int main() {
-    char diskName[] = "C:\\";
+int mainDisk() {
     ULARGE_INTEGER total, free, totalfree;
 
     if (!GetDiskFreeSpaceEx(diskName, &free, &total, &totalfree)) {
@@ -72,7 +89,6 @@ int main() {
         return 1;
     }
 
-    DISK_PERFORMANCE diskPerformance;
     DWORD bytesReturned;
     if (!DeviceIoControl(hDevice, IOCTL_DISK_PERFORMANCE, NULL, 0,
                          &diskPerformance, sizeof(diskPerformance),
