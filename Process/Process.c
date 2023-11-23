@@ -1,14 +1,7 @@
-// process_utils.c
-#include "process.h"
+#include "Process.h"
+#include <windows.h>
 #include <psapi.h>
 #include <stdio.h>
-
-
-typedef struct {
-    DWORD processId;
-    char processName[MAX_PATH];
-    char status[10];
-} ProcessInfo;
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
     DWORD lpdwProcessId;
@@ -66,9 +59,3 @@ void PrintProcesses(ProcessInfo *processList, int maxProcesses, int *numProcesse
         }
     }
 }
-
-
-//int main() {
-//    PrintProcesses();
-//    return 0;
-//}

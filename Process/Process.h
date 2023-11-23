@@ -2,15 +2,17 @@
 // Created by Mika on 2023-11-14.
 //
 
-// process_utils.h
-#ifndef PROCESS_UTILS_H
-#define PROCESS_UTILS_H
-
-#include <windows.h>
-
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
-BOOL IsUserApplication(DWORD processID);
-void PrintProcesses();
+#ifndef PROCESS_H
+#define PROCESS_H
 
 
-#endif // PROCESS_UTILS_H
+
+typedef struct {
+    unsigned long processId;
+    char processName[260];
+    char status[10];
+} ProcessInfo;
+
+void PrintProcesses(ProcessInfo *processList, int maxProcesses, int *numProcesses);
+
+#endif // PROCESS_H

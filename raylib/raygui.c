@@ -14,7 +14,7 @@
 #include "../Process/Process.h"
 
 
-void DrawGraph(int *values, int count, Rectangle bounds, Color color) {
+void DrawGraph(const int *values, int count, Rectangle bounds, Color color) {
     if (count > 1) {
         int maxValue = 0;
         for (int i = 0; i < count; i++) {
@@ -62,9 +62,7 @@ int main() {
     double memoryUsage = 0;
     double diskUsage = 0.0;
     double totalNetworkTraffic = 0.0;
-    //process info
-    ProcessInfo processList[100];
-    int numProcesses = 0;
+
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
     //close button
@@ -75,6 +73,8 @@ int main() {
     int diskHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int networkHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int historyIndex = 0;
+    ProcessInfo processList[100];
+    int numProcesses = 0;
 
     while (!WindowShouldClose()) {
         //keep track of time for graph
@@ -90,6 +90,7 @@ int main() {
             memoryUsage = getMemoryUsagePercentage();
             diskUsage = calculateDiskUsagePercentage();
             totalNetworkTraffic = calculateTotalNetworkTraffic();
+            PrintProcesses(processList, 100, &numProcesses);
 
             cpuHistory[historyIndex] = (int)(cpuUsage * 10);
             memoryHistory[historyIndex] = memoryUsage;
@@ -137,6 +138,18 @@ int main() {
         char networkText[100];
         sprintf(memoryText, "Total Network Traffic: %lf MB", totalNetworkTraffic);
         DrawText(memoryText, 400, 440, 20, GetColor(0x3299b4ff));
+
+        //print processes
+        for (int i = 0; i < numProcesses; i++) {
+            char processInfo[512];
+            sprintf(processInfo, "ID: %lu, Name: %s, Status: %s",
+                    processList[i].processId,
+                    processList[i].processName,
+                    processList[i].status);
+
+            GuiLabel((Rectangle){50, 500 + i * 20, 400, 20}, processInfo);
+        }
+
 
         //footer boxes:
         int boxHeight = 35;
