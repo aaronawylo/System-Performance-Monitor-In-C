@@ -24,10 +24,10 @@ void DrawGraph(const int *values, int count, Rectangle bounds, Color color) {
         }
 
         for (int i = 1; i < count; i++) {
-            Vector2 startPos = { bounds.x + (bounds.width / count) * (i - 1),
-                                 bounds.y + bounds.height - (values[i - 1] / (float)maxValue) * bounds.height };
-            Vector2 endPos = { bounds.x + (bounds.width / count) * i,
-                               bounds.y + bounds.height - (values[i] / (float)maxValue) * bounds.height };
+            Vector2 startPos = { bounds.x + (bounds.width / (float)count) * (float)(i - 1),
+                                 bounds.y + bounds.height - ((float)values[i - 1] / (float)maxValue) * bounds.height };
+            Vector2 endPos = { bounds.x + (bounds.width / (float)count) * (float)i,
+                               bounds.y + bounds.height - ((float)values[i] / (float)maxValue) * bounds.height };
             DrawLineV(startPos, endPos, color);
         }
     }
@@ -43,7 +43,7 @@ void DrawProcessList(ProcessInfo *processList, int numProcesses, int startX, int
     //draw headers
     for (int i = 0; i < 2; i++) {
         int columnX = startX + (i == 0 ? 0 : pidColumnWidth);
-        DrawTextEx(font, headers[i], (Vector2){columnX, startY}, fontSize, 1, GetColor(0x81c0d0ff));
+        DrawTextEx(font, headers[i], (Vector2){(float)columnX, (float)startY}, (float)fontSize, 1, GetColor(0x81c0d0ff));
     }
 
     int headerStartY = startY;
@@ -51,7 +51,7 @@ void DrawProcessList(ProcessInfo *processList, int numProcesses, int startX, int
     int outerBoxHeight = (numProcesses + 1) * (fontSize + 5) + 50;
 
     // draw the outer box
-    Rectangle outerBox = {startX - 25, headerStartY - 15, pidColumnWidth + nameColumnWidth + 20, outerBoxHeight + 30};
+    Rectangle outerBox = {(float)startX - 25, (float)headerStartY - 15, (float)pidColumnWidth + (float)nameColumnWidth + 20, (float)outerBoxHeight + 30};
     DrawRectangleLinesEx(outerBox, 1, GetColor(0x024658ff));
 
     for (int i = 0; i < numProcesses; i++) {
@@ -60,8 +60,8 @@ void DrawProcessList(ProcessInfo *processList, int numProcesses, int startX, int
         sprintf(name, "%s", processList[i].processName);
 
         //draw the PID's and names
-        DrawTextEx(font, pid, (Vector2){startX, startY + i * (fontSize + 5)}, fontSize, 1, GetColor(0x3299b4ff));
-        DrawTextEx(font, name, (Vector2){startX + pidColumnWidth, startY + i * (fontSize + 5)}, fontSize, 1, GetColor(0x3299b4ff));
+        DrawTextEx(font, pid, (Vector2){(float)startX, (float)startY + (float)i *(float)(fontSize + 5)}, (float)fontSize, 1, GetColor(0x3299b4ff));
+        DrawTextEx(font, name, (Vector2){(float)startX + (float)pidColumnWidth, (float)startY + (float)i * (float)(fontSize + 5)}, (float)fontSize, 1, GetColor(0x3299b4ff));
     }
 }
 
@@ -143,11 +143,9 @@ int main() {
             diskRead = getDiskRead();
             diskWrite = getDiskWrite();
 
-            // Update current network rates
             double currentNetworkSent = GetNetworkSent();
             double currentNetworkReceived = GetNetworkReceived();
 
-            // Update the cumulative totals
             totalNetworkSent += currentNetworkSent * UPDATE_INTERVAL;
             totalNetworkReceived += currentNetworkReceived * UPDATE_INTERVAL;
 
@@ -183,83 +181,82 @@ int main() {
         //internal window initalization
         GuiWindowBox(panelRec, "Super Awesome Activiy Monitor");
         //title
-        DrawText("SYSTEM MONITOR", 80, 80, 45, GetColor(0x3299b4ff));
-
+        DrawText("SYSTEM MONITOR", 180, 80, 45, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 80, 65, 5, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 615, 65, 5, GetColor(0x3299b4ff));
         int fontSize = 20;
+
         //cpu section
-        Rectangle cpuGraphRec = {90, spacingBetweenGraphs + 50 + 20, graphWidth, 130};
+        Rectangle cpuGraphRec = {90, (float)spacingBetweenGraphs + 50 + 20, (float)graphWidth, 130};
         DrawText("CPU", 80, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
         DrawGraph(cpuHistory, GRAPH_HISTORY_LENGTH, cpuGraphRec, GetColor(0x3299b4ff));
         char cpuText[100];
         sprintf(cpuText, "Usage: %.1f%%", cpuUsage);
-        DrawText(cpuText, 90, cpuGraphRec.y + graphHeight + 20, fontSize, GetColor(0x81c0d0ff));
-        Rectangle outerBox = {70, cpuGraphRec.y-20, 380, 130 + fontSize + 60};
+        DrawText(cpuText, 90,(int)cpuGraphRec.y + graphHeight + 20, fontSize, GetColor(0x81c0d0ff));
+        Rectangle outerBox = {70, cpuGraphRec.y-20, 380, 130 + (float)fontSize + 60};
         DrawRectangleLinesEx(outerBox, 1, GetColor(0x024658ff));
 
 
         //disk section
-        Rectangle diskGraphRec = {90, cpuGraphRec.y + cpuGraphRec.height + spacingBetweenGraphs - 15, graphWidth, graphHeight};
-        DrawText("Disk", 80, diskGraphRec.y - 25, 25, GetColor(0x3299b4ff));
+        Rectangle diskGraphRec = {90, cpuGraphRec.y + cpuGraphRec.height + (float)spacingBetweenGraphs - 15, (float)graphWidth, (float)graphHeight};
+        DrawText("Disk", 80, (int)diskGraphRec.y - 25, 25, GetColor(0x3299b4ff));
         DrawGraph(diskHistory, GRAPH_HISTORY_LENGTH, diskGraphRec, GetColor(0x3299b4ff));
         char diskText[100];
         sprintf(diskText, "Usage: %.1f%%", diskUsage);
-        DrawText(diskText, diskGraphRec.x, diskGraphRec.y + 10 + diskGraphRec.height + 25, 20, GetColor(0x81c0d0ff));
-        int diskInfoY = diskGraphRec.y + diskGraphRec.height + 60; // Adjust Y-coordinate
+        DrawText(diskText, (int)(diskGraphRec.x), (int)diskGraphRec.y + 10 + (int)diskGraphRec.height + 25, 20, GetColor(0x81c0d0ff));
+        int diskInfoY = (int)diskGraphRec.y + (int)diskGraphRec.height + 60; // Adjust Y-coordinate
         char diskReadText[100];
         sprintf(diskReadText, "Read Bytes: %.1f B", diskRead);
-        DrawText(diskReadText, diskGraphRec.x, diskInfoY + 20, 20, GetColor(0x81c0d0ff));
+        DrawText(diskReadText, (int)diskGraphRec.x, diskInfoY + 20, 20, GetColor(0x81c0d0ff));
         char diskWriteText[100];
         sprintf(diskWriteText, "Write Bytes: %.1f B", diskWrite);
         DrawText(diskWriteText, 100, diskInfoY + 50, 20, GetColor(0x81c0d0ff));
-
         Rectangle diskOuterBox = {
                 70,
                 diskGraphRec.y + 20,
                 380,
-                diskGraphRec.height + (diskInfoY - diskGraphRec.y) - 25
+                diskGraphRec.height + ((float)diskInfoY - diskGraphRec.y) - 25
         };
 
         DrawRectangleLinesEx(diskOuterBox, 1, GetColor(0x024658ff));
 
 
         //memory section
-        Rectangle memoryGraphRec = {520, spacingBetweenGraphs + 50 + 20, graphWidth, 130};
+        Rectangle memoryGraphRec = {520, (float)spacingBetweenGraphs + 50 + 20, (float)graphWidth, 130};
         DrawText("Memory", 510, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, memoryGraphRec, GetColor(0x3299b4ff));
         char memoryText[100];
         sprintf(memoryText, "Usage: %.1f%%", memoryUsage);
-        DrawText(memoryText, 520, cpuGraphRec.y + graphHeight + 20, 20, GetColor(0x81c0d0ff));
+        DrawText(memoryText, 520, (int)cpuGraphRec.y + graphHeight + 20, 20, GetColor(0x81c0d0ff));
         // Defining the outer box for the memory graph
         Rectangle memoryOuterBox = {
                 500,
                 cpuGraphRec.y-20,
                 380,
-                130 + fontSize + 60
+                130 + (float)fontSize + 60
         };
-
         DrawRectangleLinesEx(memoryOuterBox, 1, GetColor(0x024658ff)); // Drawing the rectangle
 
 
         //network section
         Vector2 position;
         position = (Vector2){510, 530};
-        DrawText("Network", position.x + 5, diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
-        GuiDrawIcon(ICON_ARROW_UP_FILL, position.x + 15, position.y + 30, 2, GetColor(0x3299b4ff));
-        DrawText(TextFormat("Sending: %.1f B/s", networkSent), position.x + 70, position.y + 35, fontSize, GetColor(0x81c0d0ff));
+        DrawText("Network", (int)position.x + 5, (int)diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_ARROW_UP_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x3299b4ff));
+        DrawText(TextFormat("Sending: %.1f B/s", networkSent), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x81c0d0ff));
         position.y += 40;
-        DrawText(TextFormat("Total Sent: %.1fB", totalNetworkSent), position.x + 70, position.y + 20, fontSize,GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Total Sent: %.1fB", totalNetworkSent),(int) position.x + 70, (int)position.y + 20, fontSize,GetColor(0x81c0d0ff));
         position.y += 40;
-        GuiDrawIcon(ICON_ARROW_DOWN_FILL, position.x + 15, position.y + 30, 2, GetColor(0x3299b4ff));
-        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), position.x + 70, position.y + 35, fontSize, GetColor(0x81c0d0ff));
+        GuiDrawIcon(ICON_ARROW_DOWN_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x3299b4ff));
+        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x81c0d0ff));
         position.y += 40;
-        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), position.x + 75, position.y + 20, fontSize, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), (int)position.x + 70, (int)position.y + 20, fontSize, GetColor(0x81c0d0ff));
         Rectangle networkOuterBox = {
                 500,
                 diskGraphRec.y + 20,
                 380,
                 position.y + 60 - (diskGraphRec.y - 25)
         };
-
         DrawRectangleLinesEx(networkOuterBox, 1, GetColor(0x024658ff));
 
 
@@ -274,36 +271,36 @@ int main() {
         //footer boxes:
         int boxHeight = 35;
         int boxY = screenHeight - boxHeight - 5;
-        //rectangle dimensions
-        Rectangle box1 = { 5, boxY, 120, boxHeight };
-        Rectangle box2 = { 5 + 120, boxY, 150, boxHeight };
-        Rectangle box3 = { 5 + 120+150, boxY, 210, boxHeight };
-        Rectangle box4 = { 5 + 120+150+210, boxY, 280, boxHeight };
-        Rectangle box5 = { 5 + 120+150+210+280, boxY, 250, boxHeight };
-        Rectangle box6 = { 5 + 120+150+210+280+250, boxY, screenWidth-165-150-300-200-200-6, boxHeight };
-        //draw the rectangles
+
+        Rectangle box1 = { 5, (float)boxY, 120, (float)boxHeight };
+        Rectangle box2 = { 5 + 120, (float)boxY, 150, (float)boxHeight };
+        Rectangle box3 = { 5 + 120+150, (float)boxY, 210, (float)boxHeight };
+        Rectangle box4 = { 5 + 120+150+210, (float)boxY, 280, (float)boxHeight };
+        Rectangle box5 = { 5 + 120+150+210+280, (float)boxY, 250, (float)boxHeight };
+        Rectangle box6 = { 5 + 120+150+210+280+250, (float)boxY, (float)screenWidth-165-150-300-200-200-6, (float)boxHeight };
+
         DrawRectangleRec(box1, GetColor(0x024658ff));
         DrawRectangleRec(box2, GetColor(0x024658ff));
         DrawRectangleRec(box3, GetColor(0x024658ff));
         DrawRectangleRec(box4, GetColor(0x024658ff));
         DrawRectangleRec(box5, GetColor(0x024658ff));
         DrawRectangleRec(box6, GetColor(0x024658ff));
-        //rectangle borders
+
         int borderWidth = 1;
         Color borderColor = GetColor(0x82cde0ff);
-        DrawRectangleLinesEx(box1, borderWidth, borderColor);
-        DrawRectangleLinesEx(box2, borderWidth, borderColor);
-        DrawRectangleLinesEx(box3, borderWidth, borderColor);
-        DrawRectangleLinesEx(box4, borderWidth, borderColor);
-        DrawRectangleLinesEx(box5, borderWidth, borderColor);
-        DrawRectangleLinesEx(box6, borderWidth, borderColor);
-        //text in rectangles
-        DrawText("USER: ", box1.x + 25, box1.y + 8, 20, GetColor(0x51bfd3ff));
-        DrawText(userName, box2.x + 25, box2.y + 8, 20, GetColor(0x51bfd3ff));
-        DrawText("DATE & TIME: ", box3.x + 25, box3.y + 8, 20, GetColor(0x51bfd3ff));
-        DrawText(dateTimeStr, box4.x + 25, box4.y + 8, 20, GetColor(0x51bfd3ff));
-        DrawText("SYSTEM UPTIME: ", box5.x + 25, box5.y + 8, 20, GetColor(0x51bfd3ff));
-        DrawText(uptimeStr, box6.x + 25, box6.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawRectangleLinesEx(box1, (float)borderWidth, borderColor);
+        DrawRectangleLinesEx(box2, (float)borderWidth, borderColor);
+        DrawRectangleLinesEx(box3, (float)borderWidth, borderColor);
+        DrawRectangleLinesEx(box4,(float) borderWidth, borderColor);
+        DrawRectangleLinesEx(box5, (float)borderWidth, borderColor);
+        DrawRectangleLinesEx(box6, (float)borderWidth, borderColor);
+
+        DrawText("USER: ", (int)box1.x + 25, (int)box1.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawText(userName, (int)box2.x + 25, (int)box2.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawText("DATE & TIME: ", (int)box3.x + 25, (int)box3.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawText(dateTimeStr, (int)box4.x + 25, (int)box4.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawText("SYSTEM UPTIME: ", (int)box5.x + 25, (int)box5.y + 8, 20, GetColor(0x51bfd3ff));
+        DrawText(uptimeStr, (int)box6.x + 25, (int)box6.y + 8, 20, GetColor(0x51bfd3ff));
 
         EndDrawing();
     }
