@@ -3,7 +3,7 @@
 #include <psapi.h>
 #include <stdio.h>
 
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
+BOOL CheckVisibleWindow(HWND hwnd, LPARAM lParam) {
     DWORD lpdwProcessId;
     GetWindowThreadProcessId(hwnd, &lpdwProcessId);
 
@@ -19,7 +19,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 }
 
 BOOL IsUserApplication(DWORD processID) {
-    return !EnumWindows(EnumWindowsProc, (LPARAM) processID);
+    return !EnumWindows(CheckVisibleWindow, (LPARAM) processID);
 }
 
 void PrintProcesses(ProcessInfo *processList, int maxProcesses, int *numProcesses) {
@@ -32,7 +32,7 @@ void PrintProcesses(ProcessInfo *processList, int maxProcesses, int *numProcesse
     }
 
     cProcesses = needed / sizeof(DWORD);
-    *numProcesses = 0; // Reset the count of processes
+    *numProcesses = 0;
 
     for (i = 0; i < cProcesses && *numProcesses < maxProcesses; i++) {
         if (processes[i] != 0) {

@@ -69,10 +69,10 @@ void DrawProcessList(ProcessInfo *processList, int numProcesses, int startX, int
 int main() {
     //application window size
     int screenWidth = 1500;
-    int screenHeight = 900;
+    int screenHeight = 870;
     //graph sizes
     int graphWidth = 260;
-    int graphHeight = 130;
+    int graphHeight = 120;
 
     int totalGraphHeight = 150;
     int totalGraphs = 3;
@@ -146,11 +146,11 @@ int main() {
             double currentNetworkSent = GetNetworkSent();
             double currentNetworkReceived = GetNetworkReceived();
 
+            networkSent = currentNetworkSent;
+            networkReceived = currentNetworkReceived;
             totalNetworkSent += currentNetworkSent * UPDATE_INTERVAL;
             totalNetworkReceived += currentNetworkReceived * UPDATE_INTERVAL;
 
-            networkSent = currentNetworkSent;
-            networkReceived = currentNetworkReceived;
 
             PrintProcesses(processList, 50, &numProcesses);
 
@@ -178,27 +178,28 @@ int main() {
 
         BeginDrawing();
         ClearBackground(RAYWHITE);
-        //internal window initalization
-        GuiWindowBox(panelRec, "Super Awesome Activiy Monitor");
-        //title
-        DrawText("SYSTEM MONITOR", 180, 80, 45, GetColor(0x3299b4ff));
-        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 80, 65, 5, GetColor(0x3299b4ff));
-        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 615, 65, 5, GetColor(0x3299b4ff));
         int fontSize = 20;
+        //internal window
+        GuiWindowBox(panelRec, "Super Awesome Activiy Monitor");
+        //title with 1 icon
+        DrawText("SYSTEM MONITOR", 75, 80, 45, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 510, 65, 5, GetColor(0x3299b4ff));
+
+        //title with 2 icons
+//        DrawText("SYSTEM MONITOR", 170, 80, 45, GetColor(0x3299b4ff));
+//        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 75, 65, 5, GetColor(0x3299b4ff));
+//        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 610, 65, 5, GetColor(0x3299b4ff));
 
         //cpu section
-        Rectangle cpuGraphRec = {90, (float)spacingBetweenGraphs + 50 + 20, (float)graphWidth, 130};
-        DrawText("CPU", 80, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
+        Rectangle cpuGraphRec = {80, (float)spacingBetweenGraphs + 60, (float)graphWidth, 120};
+        DrawText("CPU", 80, spacingBetweenGraphs + 10, 25, GetColor(0x3299b4ff));
         DrawGraph(cpuHistory, GRAPH_HISTORY_LENGTH, cpuGraphRec, GetColor(0x3299b4ff));
         char cpuText[100];
         sprintf(cpuText, "Usage: %.1f%%", cpuUsage);
-        DrawText(cpuText, 90,(int)cpuGraphRec.y + graphHeight + 20, fontSize, GetColor(0x81c0d0ff));
-        Rectangle outerBox = {70, cpuGraphRec.y-20, 380, 130 + (float)fontSize + 60};
-        DrawRectangleLinesEx(outerBox, 1, GetColor(0x024658ff));
-
+        DrawText(cpuText, 80,(int)cpuGraphRec.y + graphHeight + 20, fontSize, GetColor(0x81c0d0ff));
 
         //disk section
-        Rectangle diskGraphRec = {90, cpuGraphRec.y + cpuGraphRec.height + (float)spacingBetweenGraphs - 15, (float)graphWidth, (float)graphHeight};
+        Rectangle diskGraphRec = {80, cpuGraphRec.y + cpuGraphRec.height + (float)spacingBetweenGraphs - 15, (float)graphWidth, (float)graphHeight};
         DrawText("Disk", 80, (int)diskGraphRec.y - 25, 25, GetColor(0x3299b4ff));
         DrawGraph(diskHistory, GRAPH_HISTORY_LENGTH, diskGraphRec, GetColor(0x3299b4ff));
         char diskText[100];
@@ -211,61 +212,35 @@ int main() {
         char diskWriteText[100];
         sprintf(diskWriteText, "Write Bytes: %.1f B", diskWrite);
         DrawText(diskWriteText, (int)diskGraphRec.x, diskInfoY + 50, 20, GetColor(0x3299b4ff));
-        Rectangle diskOuterBox = {
-                70,
-                diskGraphRec.y + 20,
-                380,
-                diskGraphRec.height + ((float)diskInfoY - diskGraphRec.y) - 25
-        };
-
-        DrawRectangleLinesEx(diskOuterBox, 1, GetColor(0x024658ff));
-
 
         //memory section
-        Rectangle memoryGraphRec = {520, (float)spacingBetweenGraphs + 50 + 20, (float)graphWidth, 130};
-        DrawText("Memory", 510, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
+        Rectangle memoryGraphRec = {500, (float)spacingBetweenGraphs + 60, (float)graphWidth, 120};
+        DrawText("Memory", 500, spacingBetweenGraphs + 10, 25, GetColor(0x3299b4ff));
         DrawGraph(memoryHistory, GRAPH_HISTORY_LENGTH, memoryGraphRec, GetColor(0x3299b4ff));
         char memoryText[100];
         sprintf(memoryText, "Usage: %.1f%%", memoryUsage);
-        DrawText(memoryText, 520, (int)cpuGraphRec.y + graphHeight + 20, 20, GetColor(0x81c0d0ff));
-        // Defining the outer box for the memory graph
-        Rectangle memoryOuterBox = {
-                500,
-                cpuGraphRec.y-20,
-                380,
-                130 + (float)fontSize + 60
-        };
-        DrawRectangleLinesEx(memoryOuterBox, 1, GetColor(0x024658ff)); // Drawing the rectangle
-
+        DrawText(memoryText, 500, (int)cpuGraphRec.y + graphHeight + 20, fontSize, GetColor(0x81c0d0ff));
 
         //network section
         Vector2 position;
-        position = (Vector2){510, 530};
-        DrawText("Network", 510, (int)diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
-        GuiDrawIcon(ICON_ARROW_UP_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x81c0d0ff));
-        DrawText(TextFormat("Sending: %.1f B/s", networkSent), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x3299b4ff));
+        position = (Vector2){500, 530};
+        DrawText("Network", 500, (int)diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_ARROW_UP_FILL, (int)position.x, (int)position.y + 10, 2, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Sending: %.1f B/s", networkSent), (int)position.x + 50, (int)position.y + 15, fontSize,  GetColor(0x81c0d0ff));
         position.y += 40;
-        DrawText(TextFormat("Total Sent: %.1fB", totalNetworkSent),(int) position.x + 70, (int)position.y + 20, fontSize,GetColor(0x3299b4ff));
+        DrawText(TextFormat("Total Sent: %.1f B", totalNetworkSent),(int) position.x + 50, (int)position.y + 5, fontSize,GetColor(0x3299b4ff));
         position.y += 40;
-        GuiDrawIcon(ICON_ARROW_DOWN_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x81c0d0ff));
-        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_ARROW_DOWN_FILL, (int)position.x, (int)position.y + 25, 2, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), (int)position.x + 50, (int)position.y + 30, fontSize,  GetColor(0x81c0d0ff));
         position.y += 40;
-        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), (int)position.x + 70, (int)position.y + 20, fontSize, GetColor(0x3299b4ff));
-        Rectangle networkOuterBox = {
-                500,
-                diskGraphRec.y + 20,
-                380,
-                position.y + 60 - (diskGraphRec.y - 25)
-        };
-        DrawRectangleLinesEx(networkOuterBox, 1, GetColor(0x024658ff));
-
+        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), (int)position.x + 50, (int)position.y + 20, fontSize, GetColor(0x3299b4ff));
 
         //applications section:
         Font customFont = GetFontDefault();
         char applicationsText[100];
         sprintf(applicationsText, "Applications");
-        DrawText(applicationsText, 940, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
-        DrawProcessList(processList, numProcesses, 950, spacingBetweenGraphs + 60, customFont, fontSize);
+        DrawText(applicationsText, 900, spacingBetweenGraphs, 25, GetColor(0x3299b4ff));
+        DrawProcessList(processList, numProcesses, 920, spacingBetweenGraphs + 60, customFont, fontSize);
 
 
         //footer boxes:
