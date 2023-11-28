@@ -70,6 +70,7 @@ int main() {
     //application window size
     int screenWidth = 1500;
     int screenHeight = 870;
+
     //graph sizes
     int graphWidth = 260;
     int graphHeight = 120;
@@ -80,14 +81,18 @@ int main() {
     int spacingBetweenGraphs = totalSpacing / (totalGraphs + 1) + 50 ;
 
     InitWindow(screenWidth, screenHeight, "");
+
     //load the cyber GUI style
     GuiLoadStyleCyber();
+
     //set frame rate to 60 FPS
     SetTargetFPS(60);
+
     //get the current user system info: name, uptime, date/time
     char dateTimeStr[100];
     char* userName = getCurrentUserName();
     char uptimeStr[100];
+
     //set up for graphs
     setupPdhQuery();
     SetupSentQuery();
@@ -115,6 +120,7 @@ int main() {
 
     //Inner window
     Rectangle panelRec = { 2, 2, (float)screenWidth-4, (float)screenHeight-4 };
+
     // graph data
     int cpuHistory[GRAPH_HISTORY_LENGTH] = { 0 };
     int memoryHistory[GRAPH_HISTORY_LENGTH] = { 0 };
@@ -179,16 +185,13 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
         int fontSize = 20;
+
         //internal window
         GuiWindowBox(panelRec, "Super Awesome Activiy Monitor");
+
         //title with 1 icon
         DrawText("SYSTEM MONITOR", 75, 80, 45, GetColor(0x3299b4ff));
         GuiDrawIcon(ICON_WAVE_TRIANGULAR, 510, 65, 5, GetColor(0x3299b4ff));
-
-        //title with 2 icons
-//        DrawText("SYSTEM MONITOR", 170, 80, 45, GetColor(0x3299b4ff));
-//        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 75, 65, 5, GetColor(0x3299b4ff));
-//        GuiDrawIcon(ICON_WAVE_TRIANGULAR, 610, 65, 5, GetColor(0x3299b4ff));
 
         //cpu section
         Rectangle cpuGraphRec = {80, (float)spacingBetweenGraphs + 60, (float)graphWidth, 120};
