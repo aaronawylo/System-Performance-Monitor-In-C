@@ -8,17 +8,6 @@
 #include <stdio.h>
 #include "Memory.h"
 
-int getMemoryUsage() {
-    PROCESS_MEMORY_COUNTERS pmc;
-
-    if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-        // Print memory usage information
-        return (int)(pmc.WorkingSetSize / 1024);
-    } else {
-        return 1;
-    }
-}
-
 // Function to get the total memory usage of all processes in kilobytes
 int getCurrentMemoryUsage() {
     DWORD processes[1024];
