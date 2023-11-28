@@ -23,9 +23,9 @@ void saveData(struct PerformanceData *data, const char *filename) {
    }
 
    fprintf(file, "Timestamp: %s\n"
-                 "CPU Usage: %.2lf%\n"
-                 "Memory Usage: %.2lf%\n"
-                 "Disk Usage: %.2lf%\n"
+                 "CPU Usage: %.2lf%%\n"
+                 "Memory Usage: %.2lf%%\n"
+                 "Disk Usage: %.2lf%%\n"
                  "Network Sent: %.2lf\n"
                  "Network Received: %.2lf\n\n",
            data->timestamp, data->cpu, data->memory,
