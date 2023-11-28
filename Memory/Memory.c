@@ -5,6 +5,7 @@
 
 #include <windows.h>
 #include <psapi.h>
+#include <stdio.h>
 #include "Memory.h"
 
 int getMemoryUsage() {
@@ -17,27 +18,6 @@ int getMemoryUsage() {
         return 1;
     }
 }
-
-#include <windows.h>
-#include <stdio.h>
-#include <psapi.h>
-
-// Function to get current RAM usage in kilobytes
-//int getCurrentMemoryUsage() {
-//    PROCESS_MEMORY_COUNTERS pmc;
-//
-//    if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc))) {
-//        // Return current RAM usage in kilobytes
-//        return (int)(pmc.WorkingSetSize / 1024);
-//    } else {
-//        // Error occurred
-//        fprintf(stderr, "Failed to retrieve memory information.\n");
-//        return -1;
-//    }
-//}
-
-#include <windows.h>
-#include <stdio.h>
 
 // Function to get the total memory usage of all processes in kilobytes
 int getCurrentMemoryUsage() {
