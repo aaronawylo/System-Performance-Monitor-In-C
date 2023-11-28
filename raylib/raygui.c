@@ -71,7 +71,7 @@ int main() {
     int screenWidth = 1500;
     int screenHeight = 900;
     //graph sizes
-    int graphWidth = 230;
+    int graphWidth = 260;
     int graphHeight = 130;
 
     int totalGraphHeight = 150;
@@ -207,10 +207,10 @@ int main() {
         int diskInfoY = (int)diskGraphRec.y + (int)diskGraphRec.height + 60; // Adjust Y-coordinate
         char diskReadText[100];
         sprintf(diskReadText, "Read Bytes: %.1f B", diskRead);
-        DrawText(diskReadText, (int)diskGraphRec.x, diskInfoY + 20, 20, GetColor(0x81c0d0ff));
+        DrawText(diskReadText, (int)diskGraphRec.x, diskInfoY + 20, 20, GetColor(0x3299b4ff));
         char diskWriteText[100];
         sprintf(diskWriteText, "Write Bytes: %.1f B", diskWrite);
-        DrawText(diskWriteText, 100, diskInfoY + 50, 20, GetColor(0x81c0d0ff));
+        DrawText(diskWriteText, (int)diskGraphRec.x, diskInfoY + 50, 20, GetColor(0x3299b4ff));
         Rectangle diskOuterBox = {
                 70,
                 diskGraphRec.y + 20,
@@ -241,16 +241,16 @@ int main() {
         //network section
         Vector2 position;
         position = (Vector2){510, 530};
-        DrawText("Network", (int)position.x + 5, (int)diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
-        GuiDrawIcon(ICON_ARROW_UP_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x3299b4ff));
-        DrawText(TextFormat("Sending: %.1f B/s", networkSent), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x81c0d0ff));
+        DrawText("Network", 510, (int)diskGraphRec.y - 25, fontSize + 5, GetColor(0x3299b4ff));
+        GuiDrawIcon(ICON_ARROW_UP_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Sending: %.1f B/s", networkSent), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x3299b4ff));
         position.y += 40;
-        DrawText(TextFormat("Total Sent: %.1fB", totalNetworkSent),(int) position.x + 70, (int)position.y + 20, fontSize,GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Total Sent: %.1fB", totalNetworkSent),(int) position.x + 70, (int)position.y + 20, fontSize,GetColor(0x3299b4ff));
         position.y += 40;
-        GuiDrawIcon(ICON_ARROW_DOWN_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x3299b4ff));
-        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x81c0d0ff));
+        GuiDrawIcon(ICON_ARROW_DOWN_FILL, (int)position.x + 15, (int)position.y + 30, 2, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Receiving: %.1f B/s", networkReceived), (int)position.x + 70, (int)position.y + 35, fontSize, GetColor(0x3299b4ff));
         position.y += 40;
-        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), (int)position.x + 70, (int)position.y + 20, fontSize, GetColor(0x81c0d0ff));
+        DrawText(TextFormat("Total Received: %.1f B", totalNetworkReceived), (int)position.x + 70, (int)position.y + 20, fontSize, GetColor(0x3299b4ff));
         Rectangle networkOuterBox = {
                 500,
                 diskGraphRec.y + 20,
